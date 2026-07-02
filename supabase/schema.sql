@@ -16,6 +16,7 @@ create table if not exists public.course_leads (
 alter table public.course_leads enable row level security;
 
 -- Allow public users to submit lead form
+drop policy if exists "Allow public insert course leads" on public.course_leads;
 create policy "Allow public insert course leads"
 on public.course_leads
 for insert
@@ -91,3 +92,21 @@ create table if not exists public.sepay_transactions (
 
 alter table public.sepay_transactions enable row level security;
 -- Không tạo policy public — chỉ webhook (service role) được ghi.
+
+-- ============================================================
+-- Admin Settings
+-- ============================================================
+
+-- Cài đặt admin (API keys, webhook URLs)
+create table if not exists public.admin_settings (
+  id text primary key default '1',
+  sepay_api_key text,
+  sepay_webhook_url text,
+  bank_account_number text,
+  bank_account_name text,
+  bank_code text,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.admin_settings enable row level security;
+-- Không tạo policy public — chỉ authenticated admin được truy cập.
