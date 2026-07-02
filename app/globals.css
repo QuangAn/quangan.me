@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ===== DARK THEME — Tím/Indigo + Cyan ===== */
+    /* Nền tối tím-navy sâu */
+    --background: 255 42% 6%;
+    --foreground: 250 25% 96%;
+
+    /* Bề mặt nổi (card) sáng hơn nền một chút */
+    --card: 253 34% 10%;
+    --card-foreground: 250 25% 96%;
+
+    /* Primary: tím thương hiệu, sáng hơn để nổi trên nền tối */
+    --primary: 263 85% 66%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Nền phụ (section xen kẽ / input) */
+    --secondary: 252 28% 13%;
+    --secondary-foreground: 250 22% 94%;
+
+    --muted: 252 26% 13%;
+    /* Xám sáng đủ tương phản AA trên nền tối */
+    --muted-foreground: 250 16% 70%;
+
+    /* Accent: cyan điện */
+    --accent: 190 95% 55%;
+    --accent-foreground: 255 45% 8%;
+    /* Dùng cho chữ/nền pill accent trên nền tối */
+    --accent-strong: 190 90% 72%;
+    --accent-soft: 190 80% 14%;
+
+    --destructive: 352 85% 62%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 252 24% 18%;
+    --input: 252 24% 18%;
+    --ring: 263 85% 66%;
+
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    /* Ánh sáng tím rất nhẹ ở đỉnh trang cho chiều sâu toàn cục */
+    background-image: radial-gradient(
+      60% 40% at 50% -8%,
+      hsl(263 80% 30% / 0.28),
+      transparent 70%
+    );
+    background-attachment: fixed;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01", "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Heading dùng font display, tracking âm nhẹ cho cảm giác hiện đại/cao cấp */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Bù trừ header dính khi cuộn tới anchor */
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  /* Focus rõ ràng cho mọi link điều hướng (WCAG 2.4.7) */
+  a:focus-visible {
+    @apply rounded-md outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Chữ gradient nhấn mạnh (tím -> cyan) */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-violet-400 to-accent bg-clip-text text-transparent;
+  }
+
+  /* Biến thể nghiêng về accent (cyan) — nhịp màu thứ hai */
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent;
+  }
+
+  /* Bề mặt card chuẩn cho nền tối: viền sáng mảnh + ring inset + hairline sáng cạnh trên */
+  .card-surface {
+    @apply relative rounded-2xl border border-white/10 bg-card shadow-card ring-1 ring-inset ring-white/5;
+  }
+  .card-surface::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0 0% 100% / 0.18),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .card-hover {
+    @apply transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out hover:-translate-y-1 hover:border-primary/40 hover:bg-white/[0.02] hover:shadow-elevated;
+  }
+
+  /* Nền gradient mesh cho hero — tím + cyan, có kiểm soát */
+  .mesh-hero {
+    background-image:
+      radial-gradient(
+        42% 55% at 12% 0%,
+        hsl(263 85% 60% / 0.28),
+        transparent 60%
+      ),
+      radial-gradient(
+        40% 50% at 92% 6%,
+        hsl(190 95% 55% / 0.16),
+        transparent 62%
+      ),
+      radial-gradient(
+        55% 45% at 60% 100%,
+        hsl(280 80% 60% / 0.12),
+        transparent 70%
+      );
+  }
+
+  /* Nền gradient mềm cho các khối nhấn */
+  .surface-gradient {
+    background-image:
+      radial-gradient(
+        60% 60% at 50% 0%,
+        hsl(var(--primary) / 0.14),
+        transparent 70%
+      ),
+      radial-gradient(
+        45% 55% at 100% 0%,
+        hsl(var(--accent) / 0.10),
+        transparent 70%
+      );
+  }
+
+  /* Khối panel nhấn cao cấp: nền tối hơn + glow tím-cyan mạnh */
+  .premium-dark {
+    background-color: hsl(255 45% 8%);
+    background-image:
+      radial-gradient(
+        70% 90% at 18% 0%,
+        hsl(263 75% 45% / 0.42),
+        transparent 60%
+      ),
+      radial-gradient(
+        60% 80% at 100% 20%,
+        hsl(190 85% 50% / 0.28),
+        transparent 60%
+      );
+  }
+
+  /* Grain tinh tế chống banding cho hero và các khối tối */
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+
+  /* Mặt nạ mờ hai đầu cho dải chạy (marquee) */
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+  }
+}
+
+/* Thanh cuộn gọn gàng hơn trên desktop */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
