@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   GraduationCap,
+  BookOpen,
 } from "lucide-react";
 import { clearAdminToken, getAdminToken } from "@/lib/admin-auth";
 
@@ -73,6 +74,7 @@ export default function AdminLayout({
     { href: "/admin/leads", icon: Users, label: "Đăng ký" },
     { href: "/admin/orders", icon: ShoppingCart, label: "Đơn hàng" },
     { href: "/admin/accounts", icon: GraduationCap, label: "Tài khoản HV" },
+    { href: "/admin/course", icon: BookOpen, label: "Tài liệu" },
     { href: "/admin/settings", icon: Settings, label: "Cài đặt" },
   ];
 

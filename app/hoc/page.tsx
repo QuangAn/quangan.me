@@ -4,6 +4,7 @@ import { KeyRound } from "lucide-react";
 import { getStudentFromCookie } from "@/lib/student-server";
 import { studentPortalContent } from "@/config/student";
 import { CourseView } from "@/components/course/course-view";
+import { listCourseModules } from "@/lib/course-docs";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,8 @@ export default async function HocPortalPage() {
   if (!user) {
     redirect("/hoc/dang-nhap");
   }
+
+  const modules = await listCourseModules();
 
   return (
     <div className="space-y-6">
@@ -32,7 +35,11 @@ export default async function HocPortalPage() {
         </div>
       )}
 
-      <CourseView studentName={user.full_name} showChrome={false} />
+      <CourseView
+        studentName={user.full_name}
+        showChrome={false}
+        modules={modules}
+      />
     </div>
   );
 }

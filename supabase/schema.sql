@@ -160,3 +160,35 @@ on public.student_accounts (lower(email));
 
 create index if not exists student_accounts_created_at_idx
 on public.student_accounts (created_at desc);
+
+-- ============================================================
+-- Tài liệu khóa học (khu vực học /hoc) — admin quản lý được
+-- ============================================================
+
+-- Mỗi hàng là một module tài liệu; toàn bộ bài học (kèm khối nội dung và link
+-- video) lưu trong cột `lessons` (jsonb). Lần đầu admin mở tab "Tài liệu",
+-- server tự seed từ config/course nên không mất nội dung sẵn có. Chỉ đọc/ghi
+-- qua service role ở server (KHÔNG policy public) — học viên đọc gián tiếp qua
+-- server component /hoc.
+create table if not exists public.course_modules (
+  id text primary key,
+  -- Thứ tự hiển thị trong sidebar (số nhỏ hiện trước).
+  sort_order int not null default 0,
+  title text not null,
+  short_title text not null default '',
+  tagline text not null default '',
+  description text not null default '',
+  duration text not null default '',
+  level text not null default '',
+  outcome text not null default '',
+  -- Mảng bài học: [{ id, title, description, duration, videoLabel?, videoUrl?, main[], aside[] }]
+  lessons jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+alter table public.course_modules enable row level security;
+-- Không tạo policy public — mọi truy cập đi qua service role ở server.
+
+create index if not exists course_modules_sort_order_idx
+on public.course_modules (sort_order);

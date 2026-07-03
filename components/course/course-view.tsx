@@ -20,16 +20,25 @@ interface CourseViewProps {
    * (vd portal học viên đăng nhập tại /hoc).
    */
   showChrome?: boolean;
+  /**
+   * Danh sách module hiển thị. Mặc định lấy từ config/course; trang /hoc truyền
+   * bản đã lưu trong DB (admin sửa được).
+   */
+  modules?: CourseDocModule[];
 }
 
 /**
  * Khu vực học: sidebar chọn module, danh sách bài học dạng accordion.
- * Toàn bộ nội dung lấy từ config/course.
+ * Nội dung lấy từ prop `modules` (mặc định config/course).
  */
-export function CourseView({ studentName, showChrome = true }: CourseViewProps) {
-  const [activeModuleId, setActiveModuleId] = useState(courseModules[0].id);
+export function CourseView({
+  studentName,
+  showChrome = true,
+  modules = courseModules,
+}: CourseViewProps) {
+  const [activeModuleId, setActiveModuleId] = useState(modules[0]?.id ?? "");
   const activeModule =
-    courseModules.find((m) => m.id === activeModuleId) ?? courseModules[0];
+    modules.find((m) => m.id === activeModuleId) ?? modules[0];
 
   const selectModule = (id: string) => {
     setActiveModuleId(id);
@@ -43,7 +52,11 @@ export function CourseView({ studentName, showChrome = true }: CourseViewProps) 
         showChrome && "container pb-20 pt-8",
       )}
     >
-      <ModuleSidebar activeModuleId={activeModuleId} onSelect={selectModule} />
+      <ModuleSidebar
+        modules={modules}
+        activeModuleId={activeModuleId}
+        onSelect={selectModule}
+      />
 
       <main className="min-w-0">
         <section className="premium-dark relative overflow-hidden rounded-3xl border border-white/10 px-6 py-8 text-white sm:px-8">
@@ -61,7 +74,13 @@ export function CourseView({ studentName, showChrome = true }: CourseViewProps) 
           </div>
         </section>
 
-        <ModuleContent key={activeModule.id} module={activeModule} />
+        {activeModule ? (
+          <ModuleContent key={activeModule.id} module={activeModule} />
+        ) : (
+          <p className="mt-6 rounded-3xl border border-dashed border-white/15 p-10 text-center text-sm text-muted-foreground">
+            Tài liệu đang được cập nhật. Vui lòng quay lại sau.
+          </p>
+        )}
       </main>
     </div>
   );
@@ -104,22 +123,24 @@ export function CourseView({ studentName, showChrome = true }: CourseViewProps) 
 
 /** Sidebar chọn module: dọc trên desktop, cuộn ngang trên mobile. */
 function ModuleSidebar({
+  modules,
   activeModuleId,
   onSelect,
 }: {
+  modules: CourseDocModule[];
   activeModuleId: string;
   onSelect: (id: string) => void;
 }) {
   return (
     <aside className="min-w-0 lg:sticky lg:top-24">
       <p className="mb-3 text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
-        {courseContent.sidebarTitle}
+        {modules.length} Module
       </p>
       <nav
         aria-label="Danh sách module"
         className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
       >
-        {courseModules.map((module) => {
+        {modules.map((module) => {
           const active = module.id === activeModuleId;
           return (
             <button
@@ -247,6 +268,9 @@ function LessonCard({
                 title={lesson.videoLabel ?? lesson.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                // Không cho khung video điều hướng trang cha (chống chuyển hướng
+                // độc hại nếu lỡ dán nhầm URL); URL đã được lọc chỉ còn http(s).
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
                 className="aspect-video w-full"
               />
             </div>

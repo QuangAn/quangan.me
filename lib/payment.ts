@@ -1,4 +1,5 @@
 import { paymentConfig } from "@/config/payment";
+import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import type { BankInfo } from "@/types";
 
 /**
@@ -13,6 +14,31 @@ export function getBankInfo(): BankInfo {
     accountName:
       process.env.SEPAY_ACCOUNT_NAME || paymentConfig.bank.accountName,
   };
+}
+
+/**
+ * Lấy thông tin ngân hàng — ưu tiên admin_settings (DB), fallback về env vars / config.
+ * Dùng ở server component / API route để admin có thể sửa từ UI mà không cần deploy lại.
+ */
+export async function getBankInfoDynamic(): Promise<BankInfo> {
+  const supabase = getSupabaseServiceClient();
+  if (supabase) {
+    const { data } = await supabase
+      .from("admin_settings")
+      .select("bank_code, bank_account_number, bank_account_name")
+      .eq("id", "1")
+      .maybeSingle();
+
+    if (data) {
+      const fallback = getBankInfo();
+      return {
+        bankCode: data.bank_code || fallback.bankCode,
+        accountNumber: data.bank_account_number || fallback.accountNumber,
+        accountName: data.bank_account_name || fallback.accountName,
+      };
+    }
+  }
+  return getBankInfo();
 }
 
 /**

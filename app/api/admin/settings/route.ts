@@ -1,23 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthorizedAdmin } from "@/lib/admin-api";
 import { getBankInfo } from "@/lib/payment";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-let supabase: ReturnType<typeof createClient> | null = null;
-
-if (supabaseUrl && supabaseServiceKey) {
-  supabase = createClient(supabaseUrl, supabaseServiceKey);
-}
-
-// Initialize admin settings table if it doesn't exist
-async function initializeSettingsTable() {
-  if (!supabase) throw new Error("Supabase not configured");
-  // Table is created via migrations, not RPC
-  // This is a placeholder for future use
-}
+import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,6 +9,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const supabase = getSupabaseServiceClient();
     if (!supabase) {
       return NextResponse.json(
         { error: "Supabase not configured" },
@@ -32,29 +17,23 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get webhook URL from environment
-    const webhookUrl = process.env.SEPAY_WEBHOOK_URL || "";
-
-    // Get settings from Supabase (if table exists)
     const { data, error } = await supabase
       .from("admin_settings")
       .select("*")
-      .limit(1)
-      .single();
+      .eq("id", "1")
+      .maybeSingle();
 
-    if (error && error.code !== "PGRST116") {
-      // PGRST116 = no rows returned
-      console.warn("Settings fetch error:", error);
-    }
+    if (error) console.warn("Settings fetch error:", error);
 
-    const settings = data || { id: "1" };
+    const envFallback = getBankInfo();
+    const envWebhookUrl = process.env.SEPAY_WEBHOOK_URL || "";
 
     return NextResponse.json({
-      ...settings,
-      webhookUrl,
-      // Cùng nguồn với mã QR trên trang thanh toán (SEPAY_* / config/payment.ts)
-      // để admin không hiển thị lệch với số tài khoản khách thực sự quét.
-      bankDetails: getBankInfo(),
+      sepay_api_key: data?.sepay_api_key || "",
+      sepay_webhook_url: data?.sepay_webhook_url || envWebhookUrl,
+      bank_code: data?.bank_code || envFallback.bankCode,
+      bank_account_number: data?.bank_account_number || envFallback.accountNumber,
+      bank_account_name: data?.bank_account_name || envFallback.accountName,
     });
   } catch (error) {
     console.error("Error fetching settings:", error);
@@ -71,6 +50,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const supabase = getSupabaseServiceClient();
     if (!supabase) {
       return NextResponse.json(
         { error: "Supabase not configured" },
@@ -78,20 +58,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse request body for future use
-    await req.json();
+    const body = await req.json();
 
-    await initializeSettingsTable();
+    const { error } = await supabase.from("admin_settings").upsert(
+      {
+        id: "1",
+        sepay_api_key: body.sepay_api_key || null,
+        sepay_webhook_url: body.sepay_webhook_url || null,
+        bank_code: body.bank_code || null,
+        bank_account_number: body.bank_account_number || null,
+        bank_account_name: body.bank_account_name || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    );
 
-    // Note: Storing API keys in Supabase is optional
-    // For MVP, we store them in .env.local
-    // This endpoint is here for future extensibility
+    if (error) throw error;
 
-    return NextResponse.json({
-      success: true,
-      message:
-        "Settings configured. Use .env.local for sensitive data like API keys.",
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error updating settings:", error);
     return NextResponse.json(

@@ -82,7 +82,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
 
     case "note":
       return (
-        <div className={cn("rounded-2xl border-l-4 p-4 text-sm leading-relaxed", noteTones[block.tone])}>
+        <div className={cn("rounded-2xl border-l-4 p-4 text-sm leading-relaxed", noteTones[block.tone] ?? noteTones.info)}>
           {block.label ? <b>{block.label}: </b> : null}
           {block.content}
         </div>
@@ -92,7 +92,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
       return (
         <div className="space-y-2">
           {block.title ? <h4 className="text-sm font-bold">{block.title}</h4> : null}
-          {block.items.map((item) => (
+          {(block.items ?? []).map((item) => (
             <details
               key={item.question}
               className="group rounded-xl border border-white/10 bg-secondary/40 px-4 py-3"
@@ -116,7 +116,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
         <div className="rounded-2xl border border-white/10 bg-secondary/40 p-5">
           {block.title ? <h4 className="mb-3 text-sm font-bold">{block.title}</h4> : null}
           <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-            {block.items.map((file) => (
+            {(block.items ?? []).map((file) => (
               <div key={file.name} className="rounded-xl border border-white/10 bg-background/60 p-3">
                 <p className="text-sm font-bold">
                   <span aria-hidden>{file.emoji}</span> {file.name}
@@ -133,7 +133,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
         <div>
           {block.title ? <h4 className="mb-2 text-sm font-bold">{block.title}</h4> : null}
           <div className="flex flex-wrap gap-2">
-            {block.items.map((link) => (
+            {(block.items ?? []).map((link) => (
               <a
                 key={link.href}
                 href={link.href}
@@ -148,5 +148,9 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
           </div>
         </div>
       );
+
+    // Khối lạ (đã được lọc ở biên chuẩn hóa) — không render gì, không crash.
+    default:
+      return null;
   }
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PaymentView } from "@/components/payment/payment-view";
 import { getOrderByCode, toPublicOrder } from "@/lib/orders";
-import { buildSepayQrUrl, getBankInfo } from "@/lib/payment";
+import { buildSepayQrUrl, getBankInfoDynamic } from "@/lib/payment";
 
 // Luôn đọc trạng thái đơn mới nhất từ Supabase
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
     notFound();
   }
 
-  const bank = getBankInfo();
+  const bank = await getBankInfoDynamic();
   const qrUrl = buildSepayQrUrl(bank, order.amount, order.transfer_code);
 
   return (
