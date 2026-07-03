@@ -27,7 +27,15 @@ export default function AdminLayout({
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Trang đăng nhập KHÔNG thuộc khu vực cần xác thực — nếu không, auth gate bên
+  // dưới sẽ trả null và trang đăng nhập bị ẩn (màn hình trắng).
+  const isLoginPage = pathname === "/admin/login";
+
   useEffect(() => {
+    if (isLoginPage) {
+      setIsLoading(false);
+      return;
+    }
     const token = getAdminToken();
     if (!token) {
       router.push("/admin/login");
@@ -35,13 +43,18 @@ export default function AdminLayout({
       setIsAuthenticated(true);
     }
     setIsLoading(false);
-  }, [router]);
+  }, [router, isLoginPage]);
 
   const handleLogout = () => {
     clearAdminToken();
     setIsAuthenticated(false);
     router.push("/admin/login");
   };
+
+  // Render trang đăng nhập đứng riêng (không sidebar, không auth gate).
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
