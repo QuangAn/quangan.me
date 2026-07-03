@@ -4,91 +4,92 @@ import type { CourseDocModule } from "@/types/course";
 export const module02: CourseDocModule = {
   id: "module-2",
   order: 2,
-  title: "Module 2: Làm việc với AI đúng cách — kết quả tốt hơn, đỡ tốn token",
+  title: "Module 2: Làm việc với AI sao cho trúng ý và đỡ tốn",
   shortTitle: "02. Làm việc với AI",
-  tagline: "Tư duy đúng · Tránh lỗi tốn token · Quy trình giao việc chuẩn",
+  tagline: "Hiểu AI · Tránh lỗi tốn token · Quy trình giao việc",
   description:
-    "Trước khi bắt tay làm website, hãy hiểu AI thật sự hoạt động thế nào, tránh những thói quen khiến AI làm sai và đốt token, rồi nắm quy trình giao việc chuẩn — kèm bộ hồ sơ dự án tạo chỉ bằng một prompt.",
+    "Trước khi bắt tay làm website thật ở Module 3, mình muốn bạn hiểu AI hoạt động ra sao, tránh mấy thói quen khiến nó làm sai và ngốn token, rồi nắm cái quy trình giao việc mà bạn sẽ dùng đi dùng lại cả khóa — cuối bài có luôn một prompt tạo sẵn cả bộ hồ sơ dự án.",
   outcome:
-    "Hiểu cách AI hoạt động, tránh được các lỗi đốt token phổ biến, và có quy trình + prompt mẫu để giao việc cho AI ở mọi module sau.",
+    "Hiểu cách AI làm việc, tránh được các lỗi tốn token hay gặp, và có sẵn quy trình + prompt mẫu để giao việc cho AI ở mọi module sau.",
   lessons: [
     {
       id: "m2-b1",
-      title: "AI thật ra là ai? Hiểu để giao việc đúng",
-      description: "4 sự thật về AI giải thích gần như mọi lỗi người mới hay mắc.",
+      title: "AI thật ra là ai? Hiểu đúng để giao việc cho trúng",
+      description:
+        "4 điều về AI — hiểu rồi thì lỗi nào của người mới bạn cũng đoán được vì sao.",
       duration: "10 phút",
-      videoLabel: "AI không phải Google, cũng không phải lập trình viên",
+      videoLabel: "AI không phải Google, cũng chẳng phải lập trình viên",
       main: [
         {
           type: "card",
-          title: "Đây là bài chuẩn bị — và là bài quan trọng",
+          title: "Bài này chưa làm web đâu — nhưng đừng bỏ qua",
           body: [
-            "Module này chưa xây website. Bạn đang học cách “nói chuyện” với AI cho đúng — để đến Module 3, khi bắt tay làm thật, mọi thứ chạy trơn và ít tốn kém.",
-            "Hiểu 4 điều dưới đây, bạn tránh được gần hết lỗi mà người mới hay mắc phải.",
+            "Cả module này mình chưa đụng tới website. Bạn đang tập cách “nói chuyện” với AI cho đúng, để sang Module 3 lúc làm thật thì mọi thứ chạy mượt và đỡ tốn.",
+            "Chỉ cần thấm 4 điều dưới đây thôi, sau này gặp lỗi gì bạn cũng tự hiểu được vì sao nó xảy ra.",
           ],
         },
         {
           type: "card",
-          title: "1. AI giống một trợ lý siêu giỏi nhưng mất trí nhớ",
+          title: "1. AI giống một trợ lý cực giỏi nhưng hay quên",
           body: [
-            "Hình dung bạn thuê một trợ lý cực giỏi, làm gì cũng nhanh. Nhưng mỗi lần bạn mở một cuộc trò chuyện MỚI, họ quên sạch bạn là ai và dự án là gì — như vừa gặp một người lạ.",
-            "Vì vậy: đừng cho rằng AI “nhớ hôm qua”. Bạn phải đưa lại thông tin cho nó trong mỗi phiên làm việc.",
+            "Bạn cứ tưởng tượng mình thuê được một bạn trợ lý siêu giỏi, làm gì cũng nhanh. Có điều cứ mỗi lần bạn mở một cửa sổ chat MỚI là bạn ấy quên sạch — quên bạn là ai, quên luôn dự án đang làm, y như hai người mới gặp lần đầu.",
+            "Nên đừng trông đợi AI “nhớ chuyện hôm qua”. Mỗi lần ngồi vào làm, bạn phải đưa lại thông tin cho nó.",
           ],
         },
         {
           type: "card",
-          title: "2. AI làm việc trên một “mặt bàn” có hạn (token là đây)",
+          title: "2. AI làm việc trên một cái bàn có hạn — token nằm ở đây",
           body: [
-            "Mọi thứ bạn gõ vào và mọi thứ AI viết ra đều nằm trên một mặt bàn làm việc chung. Mặt bàn đó có giới hạn, và mỗi lần bạn nhấn Enter, AI đọc lại TOÀN BỘ mặt bàn từ đầu rồi mới trả lời.",
+            "Hình dung AI làm việc trên một mặt bàn. Mọi câu bạn gõ và mọi thứ nó viết ra đều bày lên cái bàn đó. Mà bàn thì chỉ rộng có chừng ấy, và mỗi lần bạn nhấn Enter, nó đọc lại từ đầu tới cuối cả cái bàn rồi mới trả lời.",
           ],
           list: [
-            "Lượng chữ trên mặt bàn được đo bằng đơn vị gọi là token.",
-            "Chat càng dài, mặt bàn càng đầy → mỗi câu trả lời vừa chậm hơn, vừa tốn hơn.",
-            "Bàn càng bừa, AI càng dễ bỏ sót thứ quan trọng giữa đống lộn xộn.",
+            "Lượng chữ trên bàn được đong bằng một đơn vị gọi là token.",
+            "Chat càng dài thì bàn càng chật, câu trả lời vừa chậm đi vừa tốn hơn.",
+            "Bàn mà bừa bộn thì AI dễ bỏ sót đúng cái quan trọng giữa mớ lộn xộn.",
           ],
         },
         {
           type: "card",
-          title: "3. AI luôn đoán chỗ bạn bỏ trống",
+          title: "3. Chỗ nào bạn nói lửng, AI sẽ tự đoán",
           body: [
-            "Nói với thợ may “may cho tôi cái áo đẹp đẹp”, họ sẽ tự đoán kiểu, màu, cỡ — rồi giao một cái áo khéo nhưng sai ý bạn.",
-            "AI y hệt: bạn nói mơ hồ, nó tự tin đoán và làm sai. Nói rõ ngay từ đầu = AI làm trúng, bạn đỡ phải làm lại.",
+            "Bạn ra tiệm bảo “may cho em cái áo đẹp đẹp”, thợ sẽ tự đoán kiểu, tự đoán màu, tự đoán cỡ — rồi giao cho bạn một cái áo may khéo thật nhưng chẳng đúng ý.",
+            "AI y chang vậy. Bạn nói mơ hồ thì nó cứ tự tin mà đoán, rồi làm sai. Chịu khó nói rõ ngay từ đầu là nó làm trúng, mình đỡ phải sửa tới sửa lui.",
           ],
         },
         {
           type: "note",
           tone: "warning",
-          label: "4. Chat càng dài, AI càng “trôi”",
+          label: "4. Chat kéo càng dài, AI càng lơ mơ",
           content:
-            "Cuộc trò chuyện kéo dài khiến AI dễ quên điều bạn dặn lúc đầu và trả lời lạc hướng. Khi đó, dọn bàn làm lại từ đầu nhanh hơn nhiều so với cố cãi cho AI hiểu.",
+            "Ngồi trò chuyện lâu quá thì AI hay quên mất điều bạn dặn lúc đầu và trả lời lạc đi đâu ấy. Gặp lúc đó, dọn bàn làm lại từ đầu nhanh hơn nhiều so với ngồi cãi cho nó hiểu.",
         },
       ],
       aside: [
         {
           type: "note",
           tone: "success",
-          label: "Vì sao học cái này trước?",
+          label: "Sao phải học mấy cái này trước?",
           content:
-            "Chưa cần nhớ gì về code. Chỉ cần thấm 3 điều: AI giỏi nhưng mất trí nhớ, làm trên mặt bàn có hạn, và hay đoán. Ba điều này giải thích mọi mẹo trong cả khóa.",
+            "Chưa cần biết gì về code đâu. Chỉ cần nhớ ba điều: AI giỏi nhưng hay quên, làm trên cái bàn có hạn, và hay đoán. Ba điều này giải thích được gần hết mẹo trong cả khóa.",
         },
         {
           type: "card",
-          title: "4 điều cần nhớ",
+          title: "4 điều gói lại",
           list: [
-            "AI quên sạch mỗi cuộc trò chuyện mới.",
-            "Mặt bàn (token) có hạn — giữ cho gọn.",
-            "Nói mơ hồ → AI đoán → làm sai.",
-            "Chat quá dài → AI trôi → nên làm lại.",
+            "Mở chat mới là AI quên sạch.",
+            "Bàn làm việc (token) có hạn, giữ cho gọn.",
+            "Nói lửng thì AI đoán, mà đoán thì hay trật.",
+            "Chat dài quá thì AI lơ mơ, nên làm lại cho khỏe.",
           ],
         },
         {
           type: "faq",
-          title: "Thắc mắc thường gặp",
+          title: "Thắc mắc hay gặp",
           items: [
             {
-              question: "Sao cùng một câu mà 2 lần AI trả lời khác nhau?",
+              question: "Sao cùng một câu mà hai lần AI trả lời khác nhau vậy?",
               answer:
-                "Bình thường. AI không phải máy tính bỏ túi cho ra một đáp án cố định — nó “sáng tạo” lại mỗi lần. Chưa ưng thì cứ bảo nó làm lại, hoặc mô tả rõ hơn.",
+                "Bình thường thôi. AI không phải cái máy tính bấm ra một đáp số cố định — mỗi lần nó “nghĩ” lại một kiểu. Chưa ưng thì cứ bảo làm lại, hoặc tả kỹ hơn cho nó.",
             },
           ],
         },
@@ -96,168 +97,168 @@ export const module02: CourseDocModule = {
     },
     {
       id: "m2-b2",
-      title: "5 thói quen đốt token nhiều nhất (và cách sửa)",
-      description: "Những lỗi khiến AI vừa làm sai vừa ngốn tài nguyên.",
+      title: "Mấy thói quen khiến bạn tốn token mà không hay",
+      description: "Toàn lỗi làm AI vừa sai vừa ngốn tài nguyên — mà tránh được hết.",
       duration: "10 phút",
-      videoLabel: "Vì sao càng làm càng tốn mà kết quả không ưng",
+      videoLabel: "Càng làm càng tốn mà kết quả vẫn chưa ưng, vì đâu?",
       main: [
         {
           type: "card",
-          title: "Nhắc lại nguyên lý (từ bài trước)",
+          title: "Nhắc lại một câu từ bài trước",
           body: [
-            "Mỗi lần bạn nhấn Enter, AI đọc lại toàn bộ cuộc trò chuyện từ đầu. Vì vậy mọi thứ thừa trên mặt bàn đều bị “tính tiền” lại ở MỌI câu sau.",
-            "Năm thói quen dưới đây tốn kém đều vì cùng một lý do này.",
+            "Nhớ nhé: mỗi lần bạn nhấn Enter, AI đọc lại cả cuộc trò chuyện từ đầu. Cho nên cái gì thừa trên bàn cũng bị “tính tiền” lại ở mọi câu về sau.",
+            "Mấy thói quen dưới đây tốn kém, mà tốn cũng chỉ vì đúng một lý do này thôi.",
           ],
         },
         {
           type: "card",
-          title: "Lỗi 1 — Một cuộc trò chuyện cho cả ngày",
+          title: "Lỗi 1 — Ôm một cửa sổ chat cho cả ngày",
           body: [
-            "Làm menu xong, bạn quay sang hỏi cách sửa ảnh, rồi hỏi tiếp giá tên miền — tất cả trong một chat. Mỗi câu mới, AI phải đọc lại cả buổi sáng chẳng liên quan.",
-            "❌ Sai: giữ một chat khổng lồ cho mọi việc.  ✅ Đúng: xong một việc thì gõ /clear (học ở bài sau) để dọn bàn — việc mới là một cuộc trò chuyện mới.",
+            "Làm xong cái menu, bạn quay sang hỏi cách chỉnh ảnh, xong lại hỏi tiếp giá tên miền — tất cả trong cùng một chat. Mỗi câu mới, AI phải lôi cả buổi sáng chẳng liên quan ra đọc lại.",
+            "Cách làm gọn hơn: xong một việc thì gõ /clear (bài sau chỉ cho) để dọn bàn, coi việc mới như một cuộc trò chuyện mới.",
           ],
         },
         {
           type: "card",
-          title: "Lỗi 2 — Dán lại cả file mỗi lần hỏi",
+          title: "Lỗi 2 — Cứ dán cả file mỗi lần hỏi",
           body: [
-            "Bạn copy nguyên một file dài dán vào chat để hỏi, rồi vài câu sau lại dán lại. File đó bị tính tiền LẠI mỗi lượt — hỏi qua lại 20 lần là trả tiền cho nó 20 lần.",
-            "❌ Sai: dán cả file vào chat.  ✅ Đúng: chỉ nói TÊN file, để AI tự mở đọc (nó ngồi sẵn trong thư mục dự án rồi).",
+            "Bạn copy nguyên một file dài dán vào chat để hỏi, rồi mấy câu sau lại dán lại lần nữa. Mỗi lần như vậy file đó bị tính tiền lại từ đầu — hỏi qua hỏi lại 20 lượt là bạn trả tiền cho nó 20 lần.",
+            "Thay vào đó, chỉ cần nhắc TÊN file thôi, để AI tự mở ra đọc. File nằm sẵn trong thư mục dự án rồi, nó với tay là tới.",
           ],
         },
         {
           type: "card",
-          title: "Lỗi 3 — Prompt mơ hồ kiểu “làm đẹp hơn đi”",
+          title: "Lỗi 3 — Nói kiểu “làm đẹp hơn đi”",
           body: [
-            "“Làm đẹp hơn”, “chưa ổn lắm sửa lại” — AI phải đoán bạn muốn gì, đoán sai, bạn lại sửa, nó lại đoán… mỗi vòng đều tốn token.",
-            "❌ Sai: “làm đẹp hơn”.  ✅ Đúng: nói cụ thể — “phóng to tiêu đề, đổi nút sang màu cam, thêm khoảng cách giữa các mục” + cho biết thế nào là xong.",
+            "“Làm đẹp hơn”, “nhìn chưa ổn, sửa lại” — kiểu này AI phải đoán bạn muốn gì, đoán trật, bạn lại sửa, nó lại đoán tiếp… mỗi vòng như vậy đều ăn token.",
+            "Nói thẳng ra bạn muốn gì sẽ nhanh hơn nhiều: “phóng to cái tiêu đề, đổi nút sang màu cam, giãn các mục ra cho thoáng” — và cho nó biết thế nào là xong.",
           ],
         },
         {
           type: "card",
-          title: "2 lỗi tốn kém khác (xem nhanh)",
+          title: "Còn hai lỗi nữa, nói nhanh",
           list: [
-            "❌ Nhồi 5–6 việc trong một câu → sai một chỗ kéo hỏng cả, sửa phải gánh token cả 6.  ✅ Một tin nhắn = một việc.",
-            "❌ Cãi qua cãi lại chục lượt trong một chat đã rối → mỗi lượt gửi lại tất cả lần thử sai.  ✅ 3 lượt không xong thì /clear và mô tả lại từ đầu cho sạch.",
+            "Nhồi năm sáu việc vào một câu: chỉ cần sai một chỗ là kéo hỏng cả chùm, sửa lại phải gánh token của cả sáu. Tốt nhất một tin nhắn lo một việc thôi.",
+            "Cãi qua cãi lại cả chục lượt trong một chat đã rối: mỗi lượt lại gửi kèm hết mấy lần thử sai trước đó. Thử ba lượt không xong thì /clear rồi tả lại từ đầu cho sạch.",
           ],
         },
         {
           type: "note",
           tone: "warning",
-          label: "Kiểu lãng phí lớn nhất",
+          label: "Kiểu phí phạm nặng nhất",
           content:
-            "Bắt AI đọc đi đọc lại cùng một file qua nhiều lượt là cách đốt token nhanh nhất — và hoàn toàn tránh được. Mở đúng thư mục dự án (bài sau) là AI tự đọc file, bạn khỏi dán tay.",
+            "Bắt AI đọc đi đọc lại cùng một file qua chục lượt là cách đốt token nhanh nhất — mà tránh được dễ ợt. Cứ mở đúng thư mục dự án (bài sau chỉ) là AI tự đọc file, bạn khỏi dán tay.",
         },
       ],
       aside: [
         {
           type: "faq",
-          title: "2 câu người mới hay cãi lại",
+          title: "Hai câu người mới hay cãi",
           items: [
             {
-              question: "Dán cả file cho chắc, có sao đâu?",
+              question: "Dán cả file cho chắc ăn, có sao đâu?",
               answer:
-                "AI tự đọc được file trong thư mục dự án. Dán tay vừa tốn token, vừa dễ lệch so với bản thật trên máy.",
+                "AI đọc được file trong thư mục dự án mà. Dán tay vừa tốn token, vừa dễ lệch với bản thật đang nằm trên máy bạn.",
             },
             {
-              question: "Cãi thêm vài lượt biết đâu nó hiểu?",
+              question: "Ráng cãi thêm vài lượt, biết đâu nó hiểu?",
               answer:
-                "Chat càng dài AI càng trôi. Dọn bàn rồi mô tả lại rõ ràng gần như luôn nhanh hơn cãi tiếp.",
+                "Chat càng dài AI càng lơ mơ. Dọn bàn rồi tả lại cho rõ gần như lúc nào cũng nhanh hơn ngồi cãi tiếp.",
             },
           ],
         },
         {
           type: "note",
           tone: "info",
-          label: "Khi nào biết chat đã “dài”?",
+          label: "Sao biết chat đã “dài”?",
           content:
-            "Khi bạn đã trao đổi qua lại cả chục lượt, hoặc thấy AI bắt đầu quên điều bạn dặn lúc đầu — đó là lúc nên dọn bàn (/clear).",
+            "Khi bạn đã qua lại cả chục lượt, hoặc thấy AI bắt đầu quên điều dặn lúc đầu — đó là lúc nên dọn bàn (/clear).",
         },
       ],
     },
     {
       id: "m2-b3",
-      title: "5 thói quen khiến AI làm sai ý bạn",
-      description: "Khoanh vùng, bám yêu cầu, đừng để AI tự chế.",
+      title: "Vì sao AI hay làm sai ý — và cách nói cho nó hiểu",
+      description: "Khoanh vùng cho gọn, bám đúng yêu cầu, đừng để AI tự chế.",
       duration: "9 phút",
-      videoLabel: "Nói thế nào để AI làm đúng thứ bạn cần",
+      videoLabel: "Nói thế nào để AI làm đúng cái bạn cần",
       main: [
         {
           type: "card",
-          title: "❌ → ✅ (5 lỗi làm sai ý)",
+          title: "5 kiểu nói khiến AI làm trật (và nói lại cho đúng)",
           list: [
-            "❌ “Web bị lỗi, sửa đi” → AI lục cả dự án, sửa cả chỗ đang chạy tốt.  ✅ “Chỉ sửa nút Gửi trong file form liên hệ, chỗ khác đừng đụng.”",
-            "❌ Để AI tự ý thêm tính năng → website phình to, lệch yêu cầu, tốn token sinh ra rồi tốn token gỡ.  ✅ “Chỉ làm đúng phần tôi liệt kê; muốn thêm gì phải hỏi tôi trước.”",
-            "❌ Đổi ý liên tục khi AI đang làm dở → công một nửa bỏ phí.  ✅ Chốt yêu cầu rồi mới cho làm; đổi lớn thì dừng lại, mô tả lại từ đầu.",
-            "❌ Gõ vài từ khóa như tìm Google (“form Supabase”) → nhận trả lời chung chung.  ✅ Giao việc như cho cộng sự: bối cảnh + việc cần làm + ràng buộc.",
-            "❌ Prompt 500 chữ lan man → yêu cầu quan trọng bị chôn, lại bị gửi lại mỗi lượt.  ✅ 3 dòng gọn: bối cảnh — việc cần làm — kết quả mong đợi.",
+            "Bảo trống không “web bị lỗi, sửa đi” thì AI lục tung cả dự án, sửa luôn cả chỗ đang chạy ngon. Nói rõ ra: “chỉ sửa cái nút Gửi trong file form liên hệ thôi, chỗ khác đừng đụng”.",
+            "Để AI tự tiện thêm tính năng thì website cứ phình ra, lệch khỏi ý bạn, tốn token đẻ ra rồi lại tốn token dọn. Dặn trước: “chỉ làm đúng phần tôi liệt kê, muốn thêm gì phải hỏi tôi”.",
+            "Đang làm dở mà bạn đổi ý liên tục thì công nửa chừng đổ sông đổ biển. Chốt xong yêu cầu rồi hẵng cho làm; muốn đổi lớn thì dừng lại, tả lại từ đầu.",
+            "Gõ vài từ khóa cụt lủn như tra Google (“form Supabase”) thì nhận lại câu trả lời chung chung. Giao việc cho AI như giao cho một cộng sự: kể bối cảnh, nói việc cần làm, dặn cái gì không được đụng.",
+            "Viết một prompt 500 chữ lan man thì yêu cầu quan trọng bị chôn mất, mà cả đoạn đó còn bị gửi lại mỗi lượt. Ba dòng gọn là đủ: đang làm gì, cần làm gì, xong trông ra sao.",
           ],
         },
         {
           type: "card",
-          title: "Công thức một prompt tốt",
+          title: "Công thức một prompt gọn mà đủ",
           ordered: true,
           list: [
-            "Bối cảnh: một câu về việc đang làm.",
-            "Việc cần làm: càng cụ thể càng tốt.",
+            "Bối cảnh: một câu cho AI biết bạn đang làm gì.",
+            "Việc cần làm: càng cụ thể càng đỡ phải đoán.",
             "Ràng buộc: chỗ nào KHÔNG được đụng vào.",
-            "“Xong nghĩa là gì”: để bạn và AI cùng biết khi nào đạt.",
+            "Xong là thế nào: để cả bạn và AI cùng biết lúc nào coi như đạt.",
           ],
         },
         {
           type: "note",
           tone: "success",
-          label: "Coi AI là cộng sự, không phải Google",
+          label: "Coi AI như cộng sự, đừng coi như Google",
           content:
-            "Google trả về trang có sẵn. AI thì TỰ LÀM ra thứ mới theo lời bạn — nên lời bạn càng rõ, kết quả càng trúng. Và luôn rà lại việc AI làm, đừng tin 100% ngay.",
+            "Google trả về mấy trang có sẵn cho bạn chọn. Còn AI thì TỰ TAY làm ra cái mới theo lời bạn — nên lời bạn càng rõ, nó làm càng trúng. Mà làm xong nhớ rà lại, đừng vội tin 100%.",
         },
       ],
       aside: [
         {
           type: "note",
           tone: "warning",
-          label: "Khoanh vùng = tiết kiệm",
+          label: "Khoanh vùng cũng là tiết kiệm",
           content:
-            "Bảo AI “đi tìm lỗi khắp dự án” khiến nó nạp hàng loạt file vào mặt bàn (rồi bị tính tiền ở mọi lượt sau), trong khi lỗi thường chỉ nằm ở một file. Chỉ đúng file thì sửa nhanh và rẻ.",
+            "Bảo AI “đi dò lỗi khắp dự án” là nó lôi cả đống file lên bàn (rồi bị tính tiền ở mọi lượt sau), trong khi lỗi thường chỉ nằm gọn trong một file. Chỉ đúng file cho nó thì sửa vừa nhanh vừa rẻ.",
         },
         {
           type: "card",
-          title: "Ví dụ “xong nghĩa là gì”",
+          title: "“Xong là thế nào” — vài ví dụ cho dễ hình dung",
           list: [
-            "Bấm nút xong hiện thông báo “Đã gửi”.",
-            "Trên điện thoại chữ không bị tràn ra ngoài.",
-            "Ảnh sản phẩm hiện đủ, không vỡ nét.",
+            "Bấm nút xong thì hiện chữ “Đã gửi”.",
+            "Mở trên điện thoại chữ không bị tràn ra ngoài màn hình.",
+            "Ảnh sản phẩm hiện đủ, không bị vỡ nét.",
           ],
         },
       ],
     },
     {
       id: "m2-b4",
-      title: "Quy trình giao việc chuẩn (6 prompt bạn dùng cả khóa)",
-      description: "Một vòng lặp lặp đi lặp lại ở mọi module sau.",
+      title: "Quy trình giao việc cho AI — cái vòng bạn lặp lại cả khóa",
+      description: "Một vòng quen tay, module nào cũng xoay quanh nó.",
       duration: "9 phút",
-      videoLabel: "Vòng lặp: brief → tài liệu → duyệt kế hoạch → làm 1 việc → kiểm tra",
+      videoLabel: "Vòng lặp: brief → tài liệu → duyệt kế hoạch → làm từng việc → kiểm tra",
       main: [
         {
           type: "card",
-          title: "Trước hết: “brief” là gì?",
+          title: "Trước tiên, “brief” là gì đã?",
           body: [
-            "Brief = bản mô tả ngắn bạn muốn gì (giống tờ đề bài). Mọi việc với AI đều bắt đầu từ một brief rõ ràng.",
-            "Ví dụ brief cho quán cafe: “Website giới thiệu quán cafe nhỏ, có menu và form đặt bàn, phong cách ấm áp, xem tốt trên điện thoại.”",
+            "Brief là bản mô tả ngắn gọn bạn muốn gì, giống cái đề bài ấy. Mọi việc với AI đều bắt đầu từ một cái brief cho rõ ràng.",
+            "Ví dụ brief cho quán cafe: “Website giới thiệu một quán cafe nhỏ, có menu với form đặt bàn, phong cách ấm áp, xem trên điện thoại phải đẹp.”",
           ],
         },
         {
           type: "card",
-          title: "Vòng lặp giao việc chuẩn",
+          title: "Vòng lặp giao việc",
           ordered: true,
           list: [
-            "Viết brief ngắn (bạn muốn gì).",
-            "Cho AI biến brief thành bộ tài liệu dự án (bài sau).",
-            "Cho AI đọc tài liệu, tóm tắt và đề xuất kế hoạch — CHƯA code.",
-            "Bạn duyệt kế hoạch, sửa nếu cần.",
-            "Cho AI làm ĐÚNG một việc (một task).",
-            "Bạn kiểm tra kết quả (chạy thử / xem trên màn hình).",
-            "Sai thì bảo AI sửa đúng chỗ; đúng thì lưu lại (commit) rồi sang việc tiếp.",
+            "Viết một cái brief ngắn — bạn muốn gì.",
+            "Nhờ AI biến brief đó thành bộ tài liệu dự án (bài sau chỉ).",
+            "Cho AI đọc tài liệu, tóm tắt lại và đề xuất kế hoạch — khoan code vội.",
+            "Bạn xem kế hoạch, thấy chỗ nào chưa ổn thì chỉnh.",
+            "Cho AI làm đúng MỘT việc thôi.",
+            "Bạn kiểm tra kết quả — chạy thử, ngó lên màn hình.",
+            "Sai thì bảo nó sửa đúng chỗ; đúng thì lưu lại (commit) rồi qua việc kế.",
           ],
         },
         {
@@ -265,16 +266,16 @@ export const module02: CourseDocModule = {
           tone: "success",
           label: "6 “prompt lõi” bạn sẽ gặp lại suốt khóa",
           content:
-            "Khởi động · Đọc & lập kế hoạch · Giao task · Sửa lỗi · Chỉnh giao diện · Rà soát. Không cần học thuộc — chỉ cần biết mỗi lần làm việc với AI đều xoay quanh 6 kiểu prompt này. Các module sau sẽ gọi tên chúng.",
+            "Khởi động · Đọc & lập kế hoạch · Giao task · Sửa lỗi · Chỉnh giao diện · Rà soát. Khỏi học thuộc — chỉ cần biết lần nào làm với AI cũng xoay quanh sáu kiểu prompt này. Mấy module sau mình sẽ gọi tên chúng khi cần.",
         },
         {
           type: "card",
-          title: "Nguyên tắc vàng",
+          title: "Mấy điều đừng quên",
           list: [
-            "Luôn bắt đầu từ một brief.",
-            "Một tin nhắn = một việc.",
-            "Duyệt kế hoạch trước khi cho code.",
-            "Kiểm tra sau mỗi bước, đừng dồn đến cuối.",
+            "Luôn khởi đầu bằng một cái brief.",
+            "Một tin nhắn chỉ lo một việc.",
+            "Xem kế hoạch xong rồi mới cho code.",
+            "Làm bước nào kiểm bước đó, đừng để dồn tới cuối.",
           ],
         },
       ],
@@ -282,61 +283,61 @@ export const module02: CourseDocModule = {
         {
           type: "note",
           tone: "info",
-          label: "Mẹo: dán đúng lỗi, đừng tả lại",
+          label: "Mẹo nhỏ: dán đúng dòng lỗi, đừng tả lại",
           content:
-            "Khi kiểm tra thấy lỗi, hãy COPY nguyên dòng báo lỗi trong Terminal dán cho AI — đừng tả lại bằng lời. Dán đúng lỗi thì AI sửa trúng, khỏi phải đoán.",
+            "Lúc chạy thử mà ra lỗi, cứ COPY nguyên dòng báo lỗi trong Terminal dán cho AI — đừng ngồi tả lại bằng lời. Dán đúng cái lỗi thì nó sửa trúng ngay, khỏi phải đoán.",
         },
         {
           type: "card",
-          title: "Module 2 khác Module 3 chỗ nào?",
+          title: "Module 2 với Module 3 khác nhau chỗ nào?",
           body: [
-            "Ở đây bạn HIỂU quy trình và có sẵn prompt trong tay. Sang Module 3, bạn CHẠY THẬT quy trình này lần đầu để ra một landing page trên máy.",
+            "Ở đây bạn HIỂU cái quy trình và có sẵn prompt trong tay. Qua Module 3, bạn sẽ CHẠY THẬT nó lần đầu để ra một landing page ngay trên máy mình.",
           ],
         },
       ],
     },
     {
       id: "m2-b5",
-      title: "Mở dự án & tạo bộ hồ sơ 6 file bằng MỘT prompt",
-      description: "Mở thư mục an toàn, rồi để AI tạo cả bộ tài liệu.",
+      title: "Mở dự án và để AI tạo cả bộ hồ sơ chỉ bằng một prompt",
+      description: "Mở thư mục cho an toàn, rồi để AI dựng luôn cả bộ tài liệu.",
       duration: "11 phút",
-      videoLabel: "Mở thư mục + một prompt “Khởi động” tạo cả bộ tài liệu",
+      videoLabel: "Mở thư mục + một prompt “Khởi động” dựng cả bộ tài liệu",
       main: [
         {
           type: "card",
-          title: "Mở dự án đúng cách (nhắc nhanh từ Module 1)",
+          title: "Mở dự án cho đúng (nhắc nhanh từ Module 1)",
           ordered: true,
           list: [
-            "Tạo một thư mục RIÊNG cho dự án, ví dụ cafe-website (mỗi dự án một thư mục để AI không lẫn file).",
-            "Mở VS Code → File → Open Folder → chọn thư mục đó.",
-            "Lần đầu mở, VS Code hỏi có tin cậy thư mục không → bấm “Yes, I trust the authors”.",
-            "Mở Terminal (menu Terminal → New Terminal, hoặc Ctrl + `) rồi gõ claude và Enter — như đã làm ở Module 1.",
+            "Tạo một thư mục RIÊNG cho dự án, ví dụ cafe-website. Mỗi dự án một thư mục để AI khỏi lẫn file lung tung.",
+            "Mở VS Code, vào File → Open Folder, chọn đúng thư mục đó.",
+            "Lần đầu mở, VS Code hỏi có tin thư mục này không — bấm “Yes, I trust the authors”.",
+            "Mở Terminal (menu Terminal → New Terminal, hoặc bấm Ctrl + `), gõ claude rồi Enter — như hồi Module 1.",
           ],
         },
         {
           type: "note",
           tone: "success",
-          label: "2 điều mới cần nhớ",
+          label: "Hai điều mới cần nhớ",
           content:
-            "① Mỗi dự án một thư mục riêng. ② AI chỉ “nhìn thấy” các file trong thư mục bạn đang mở — nên mở đúng thư mục là AI tự đọc được file, bạn khỏi dán tay (nhớ lỗi đốt token ở bài trước).",
+            "Một là mỗi dự án một thư mục riêng. Hai là AI chỉ “nhìn thấy” mấy file nằm trong thư mục bạn đang mở — nên mở đúng thư mục thì nó tự đọc được file, bạn khỏi phải dán tay (nhớ cái lỗi tốn token ở bài trước chứ?).",
         },
         {
           type: "files",
-          title: "Bộ hồ sơ dự án — luôn đủ 6 file",
+          title: "Bộ hồ sơ dự án — lúc nào cũng đủ 6 file",
           items: [
-            { emoji: "📄", name: "PROJECT.md", description: "Giới thiệu dự án: làm cho ai, mục tiêu gì." },
-            { emoji: "🎯", name: "PRD.md", description: "Website cần có những trang và phần nào." },
-            { emoji: "🎨", name: "UI_UX_SPEC.md", description: "Giao diện nhìn ra sao: màu, phong cách, bố cục." },
-            { emoji: "🗂", name: "DATABASE.md", description: "Dữ liệu cần lưu — chuẩn bị sẵn cho Module 7." },
-            { emoji: "✅", name: "TASKS.md", description: "Danh sách việc AI làm lần lượt." },
-            { emoji: "🤖", name: "CLAUDE.md", description: "Luật làm việc cho AI (AI tự đọc mỗi phiên)." },
+            { emoji: "📄", name: "PROJECT.md", description: "Giới thiệu dự án: làm cho ai, để làm gì." },
+            { emoji: "🎯", name: "PRD.md", description: "Website gồm những trang nào, mỗi trang có gì." },
+            { emoji: "🎨", name: "UI_UX_SPEC.md", description: "Nhìn ra sao: màu mè, phong cách, bố cục." },
+            { emoji: "🗂", name: "DATABASE.md", description: "Cần lưu dữ liệu gì — dọn sẵn cho Module 7." },
+            { emoji: "✅", name: "TASKS.md", description: "Danh sách việc, AI làm lần lượt từng cái." },
+            { emoji: "🤖", name: "CLAUDE.md", description: "Luật làm việc cho AI (nó tự đọc mỗi phiên)." },
           ],
         },
         {
           type: "prompt",
-          title: "Prompt “Khởi động” — tạo cả 6 file bằng một lần",
+          title: "Prompt “Khởi động” — một phát ra đủ 6 file",
           intro:
-            "Chỉ cần MỘT prompt cho cả bộ. Thay đúng phần trong [ngoặc] bằng brief của bạn, phần còn lại giữ nguyên:",
+            "Cả bộ chỉ cần MỘT prompt. Bạn thay đúng phần trong [ngoặc] bằng brief của mình, còn lại giữ nguyên:",
           copyLabel: "Copy prompt Khởi động",
           prompt: `Bạn là Product Manager kiêm Senior Frontend. Dựa trên brief dưới đây, hãy tạo đủ 6 file tài liệu cho dự án:
 
@@ -355,16 +356,16 @@ Brief của tôi:
         {
           type: "note",
           tone: "warning",
-          label: "DATABASE.md — đừng bao giờ bỏ",
+          label: "DATABASE.md — đừng có bỏ",
           content:
-            "Luôn tạo DATABASE.md kể cả khi chưa lưu dữ liệu gì. Nó là bản mô tả để đến Module 7 nối được với Supabase. Bỏ nó là hụt “hợp đồng” với các module sau.",
+            "Cứ tạo DATABASE.md kể cả khi giờ chưa lưu dữ liệu gì. Nó là bản mô tả để tới Module 7 mình nối được với Supabase. Bỏ nó là hụt mất “lời hẹn” với mấy module sau.",
         },
         {
           type: "card",
-          title: "Kiểm tra ngay: cho AI nhắc lại (thử 30 giây)",
+          title: "Thử ngay cho vui: bảo AI nhắc lại (30 giây)",
           body: [
-            "Sau khi AI tạo xong, gõ thử: “Liệt kê 6 file bạn vừa tạo và mỗi file nói về gì.”",
-            "Nếu AI tóm đúng ý bạn, nghĩa là nó đã hiểu dự án — đây là lần đầu bạn thấy AI làm việc theo tài liệu của CHÍNH MÌNH.",
+            "AI tạo xong, bạn gõ thử: “Liệt kê 6 file bạn vừa tạo, mỗi file nói về cái gì.”",
+            "Nó tóm đúng ý bạn nghĩa là đã hiểu dự án — và đây là lần đầu bạn thấy AI làm việc dựa trên tài liệu của CHÍNH BẠN.",
           ],
         },
       ],
@@ -374,20 +375,20 @@ Brief của tôi:
           tone: "info",
           label: "AI tự tạo file trong thư mục",
           content:
-            "Claude Code sẽ tự tạo 6 file này ngay trong thư mục dự án — bạn không phải copy dán tay. Nhìn danh sách file bên trái VS Code là thấy chúng hiện ra.",
+            "Claude Code sẽ tự đẻ ra 6 file này ngay trong thư mục dự án, bạn không phải copy dán gì hết. Ngó cột danh sách file bên trái VS Code là thấy chúng hiện ra.",
         },
         {
           type: "faq",
           title: "Hỏi nhanh",
           items: [
             {
-              question: "Không thấy hộp thoại hỏi “trust”?",
-              answer: "Nó chỉ hiện lần đầu mở một thư mục mới. Không hiện cũng không sao.",
+              question: "Không thấy hộp hỏi “trust” thì sao?",
+              answer: "Nó chỉ hiện lần đầu mở một thư mục mới thôi. Không thấy cũng chẳng sao.",
             },
             {
               question: "Landing page đơn giản có cần đủ 6 file không?",
               answer:
-                "Có. Luôn đủ 6 file để đồng bộ với các module sau. File nào chưa dùng thì cứ để mô tả ngắn, không thừa.",
+                "Có nha. Cứ đủ 6 file cho đồng bộ với mấy module sau. File nào chưa dùng tới thì để mô tả ngắn gọn, không thừa đâu.",
             },
           ],
         },
@@ -395,8 +396,8 @@ Brief của tôi:
     },
     {
       id: "m2-b6",
-      title: "Bí mật CLAUDE.md tự nạp & 3 lệnh tiết kiệm token",
-      description: "Những lệnh gõ trong khung chat giúp giữ mặt bàn gọn.",
+      title: "Chuyện CLAUDE.md tự đọc và vài lệnh giúp đỡ tốn",
+      description: "Mấy lệnh gõ thẳng trong khung chat, giữ cái bàn cho gọn.",
       duration: "9 phút",
       videoLabel: "/clear, @file và vì sao đừng bảo AI “đọc CLAUDE.md”",
       main: [
@@ -405,15 +406,15 @@ Brief của tôi:
           tone: "warning",
           label: "Hiểu lầm phổ biến nhất",
           content:
-            "Bạn KHÔNG bao giờ cần gõ “hãy đọc CLAUDE.md”. Claude Code tự đọc file này mỗi khi mở phiên làm việc. Gõ thêm câu đó chỉ tốn token vô ích. Việc của bạn chỉ là viết luật ngắn gọn vào file (nên dưới ~200 dòng).",
+            "Bạn KHÔNG bao giờ cần gõ “hãy đọc CLAUDE.md”. Claude Code tự đọc file này mỗi khi mở phiên rồi. Gõ thêm câu đó chỉ tốn token vô ích. Việc của bạn chỉ là viết luật cho gọn vào file thôi (ráng dưới ~200 dòng).",
         },
         {
           type: "card",
-          title: "3 lệnh gõ ngay trong khung chat",
+          title: "3 lệnh gõ thẳng trong khung chat",
           list: [
-            "/clear — xong một việc, chuyển sang việc KHÁC không liên quan → dọn sạch mặt bàn, bắt đầu lại. Đây là lệnh tiết kiệm token quan trọng nhất.",
-            "@ + tên file — đưa đúng MỘT file cho AI xem (gõ @ rồi chọn file). Nhanh và rẻ hơn để AI tự đi lục tìm.",
-            "/compact — khi VẪN đang làm cùng một việc nhưng chat đã quá dài → AI tóm gọn lại lịch sử, giữ mạch mà nhẹ bàn hơn.",
+            "/clear — làm xong một việc, chuyển qua việc KHÁC không liên quan thì gõ cái này để dọn sạch bàn, bắt đầu lại từ đầu. Đây là lệnh tiết kiệm token đáng nhớ nhất.",
+            "@ rồi tên file — đưa đúng MỘT file cho AI xem (gõ @ xong chọn file). Cách này nhanh và rẻ hơn để nó tự đi lục tìm.",
+            "/compact — vẫn đang làm cùng một việc mà chat lỡ dài quá, gõ cái này để AI tóm gọn lại phần đã nói, giữ mạch mà bàn nhẹ đi.",
           ],
         },
         {
@@ -421,13 +422,13 @@ Brief của tôi:
           tone: "info",
           label: "/clear hay /compact?",
           content:
-            "Việc MỚI, không liên quan → /clear (xóa hẳn). Cùng một việc, chat quá dài → /compact (tóm gọn, giữ mạch). Nhớ đơn giản: đổi việc thì clear, cùng việc thì compact.",
+            "Việc MỚI, chẳng liên quan gì → /clear (xóa hẳn). Cùng một việc mà chat dài quá → /compact (tóm gọn, giữ mạch). Nhớ cho dễ: đổi việc thì clear, cùng việc thì compact.",
         },
         {
           type: "card",
-          title: "Xem mình đã dùng bao nhiêu",
+          title: "Xem mình đã xài hết bao nhiêu",
           body: [
-            "Muốn biết phiên này đã tiêu tốn bao nhiêu, gõ /usage (một số phiên bản dùng /cost). Con số này giúp bạn nhận ra thói quen nào đang đốt token để chỉnh lại.",
+            "Muốn biết phiên này đã tiêu tốn cỡ nào thì gõ /usage (vài bản dùng /cost). Con số đó giúp bạn nhận ra thói quen nào đang ngốn token để mà chỉnh lại.",
           ],
         },
       ],
@@ -435,9 +436,9 @@ Brief của tôi:
         {
           type: "note",
           tone: "success",
-          label: "Mấu chốt: chất lượng, không chỉ tiền",
+          label: "Cốt lõi là chất lượng, không chỉ tiền",
           content:
-            "Dù bạn dùng gói trả tháng (không tính tiền theo lượt), giữ mặt bàn gọn vẫn cho kết quả TỐT HƠN và nhanh hơn. Tiết kiệm tiền chỉ là phần thưởng kèm theo.",
+            "Kể cả bạn xài gói trả tháng (không tính tiền theo lượt), giữ cái bàn cho gọn vẫn cho ra kết quả TỐT HƠN và nhanh hơn. Tiết kiệm tiền chỉ là phần thưởng kèm thêm.",
         },
         {
           type: "faq",
@@ -445,12 +446,12 @@ Brief của tôi:
           items: [
             {
               question: "Có phải nhắc AI “đọc CLAUDE.md” mỗi lần không?",
-              answer: "Không. Nó tự đọc mỗi phiên. Nhắc thêm chỉ tốn token.",
+              answer: "Không. Nó tự đọc mỗi phiên rồi. Nhắc thêm chỉ tốn token.",
             },
             {
-              question: "CLAUDE.md nên dài bao nhiêu?",
+              question: "CLAUDE.md nên viết dài cỡ nào?",
               answer:
-                "Càng ngắn gọn càng tốt, nên dưới ~200 dòng. Dài quá vừa tốn token mỗi tin nhắn, vừa khiến AI khó tuân thủ.",
+                "Càng gọn càng tốt, ráng dưới ~200 dòng. Dài quá vừa tốn token mỗi tin nhắn, vừa làm AI khó theo cho hết.",
             },
           ],
         },
@@ -458,92 +459,92 @@ Brief của tôi:
     },
     {
       id: "m2-b7",
-      title: "Duyệt kế hoạch trước, dừng đúng lúc & lưới an toàn",
-      description: "Plan Mode, phím Esc và cách hoàn tác khi lỡ sai.",
+      title: "Xem kế hoạch trước khi cho làm, và cách quay lại khi lỡ",
+      description: "Plan Mode, phím Esc, và tấm lưới đỡ khi lỡ tay sai.",
       duration: "9 phút",
       videoLabel: "Shift+Tab để lập kế hoạch, Esc để dừng, và cách quay lại",
       main: [
         {
           type: "card",
-          title: "Plan Mode — bắt AI trình kế hoạch trước khi sửa",
+          title: "Plan Mode — bắt AI trình kế hoạch trước khi đụng vào",
           body: [
-            "Với việc lớn hoặc phức tạp, nhấn Shift + Tab để chuyển Claude Code sang chế độ lập kế hoạch (Plan Mode).",
-            "Ở chế độ này AI chỉ ĐỌC dự án và ĐỀ XUẤT kế hoạch — chưa đụng vào file nào. Bạn xem, duyệt hoặc chỉnh, rồi mới cho nó bắt tay làm.",
+            "Với việc lớn hoặc rối rối, bạn nhấn Shift + Tab để chuyển Claude Code sang chế độ lập kế hoạch (Plan Mode).",
+            "Ở chế độ này AI chỉ ĐỌC dự án rồi ĐỀ XUẤT kế hoạch thôi, chưa đụng vào file nào hết. Bạn xem, gật đầu hoặc chỉnh lại, rồi mới cho nó bắt tay làm.",
           ],
         },
         {
           type: "note",
           tone: "warning",
-          label: "Đây là cách rẻ nhất để tránh làm lại",
+          label: "Đây là cách rẻ nhất để khỏi làm lại",
           content:
-            "Sửa hướng đi khi nó mới chỉ là KẾ HOẠCH thì rẻ và nhanh. Để AI code sai cả loạt rồi mới phát hiện, phải đập đi làm lại — vừa mất thời gian vừa tốn token.",
+            "Chỉnh hướng đi lúc nó mới là KẾ HOẠCH thì vừa nhanh vừa rẻ. Chứ để AI code sai cả loạt rồi mới phát hiện, phải đập đi làm lại thì vừa mất công vừa tốn token.",
         },
         {
           type: "card",
-          title: "Esc — dừng ngay khi thấy sai",
+          title: "Esc — thấy sai là dừng liền",
           body: [
-            "Đang chạy mà thấy AI đi SAI hướng, nhấn Esc để dừng lại ngay, rồi gõ lại yêu cầu cho đúng.",
-            "Đừng ngồi chờ nó làm xong một thứ bạn biết chắc sẽ bỏ — đó là token ném đi.",
+            "Đang chạy mà bạn thấy AI đi sai hướng, nhấn Esc để nó dừng ngay, rồi gõ lại yêu cầu cho đúng.",
+            "Đừng ngồi chờ nó làm cho xong một thứ mà bạn biết chắc sẽ bỏ — chờ vậy là ném token qua cửa sổ.",
           ],
         },
         {
           type: "note",
           tone: "info",
-          label: "Lưới an toàn khi lỡ sai",
+          label: "Tấm lưới đỡ khi lỡ tay",
           content:
-            "Claude Code cho phép hoàn tác các thay đổi file mà nó vừa làm (thường bằng lệnh /rewind, hoặc nhấn Esc hai lần để mở lịch sử). Nhưng nó KHÔNG thay thế cho Git — nên xong một việc chạy ổn, hãy lưu lại (xem thẻ bên).",
+            "Claude Code cho phép hoàn tác mấy thay đổi file mà nó vừa làm (thường là gõ /rewind, hoặc nhấn Esc hai lần để mở lịch sử). Nhưng cái này KHÔNG thay được Git đâu — nên xong một việc chạy ổn thì nhớ lưu lại (xem thẻ bên).",
         },
       ],
       aside: [
         {
           type: "card",
-          title: "Lưu lại = “điểm save” của game",
+          title: "Lưu lại = cái “điểm save” trong game",
           body: [
-            "Commit nghĩa là bấm nút “lưu điểm” cho code — giống save game. Có điểm lưu là có đường quay lại nếu bước sau hỏng.",
-            "Chưa cần học Git sâu (Module 8 dạy kỹ). Giờ chỉ cần nhờ AI: “Nếu dự án chưa có Git thì khởi tạo giúp tôi, rồi lưu lại (commit) với ghi chú: xong-form-dat-ban.”",
+            "Commit nói cho vui là bấm nút “lưu điểm” cho code, y như save game. Có điểm lưu thì lỡ bước sau hỏng, mình còn đường quay về.",
+            "Chưa cần học Git sâu đâu (Module 8 sẽ dạy kỹ). Giờ chỉ cần nhờ AI: “Nếu dự án chưa có Git thì khởi tạo giúp tôi, rồi lưu lại (commit) kèm ghi chú: xong-form-dat-ban.”",
           ],
         },
         {
           type: "note",
           tone: "warning",
-          label: "Đừng nhầm hai kiểu nhấn Esc",
+          label: "Đừng lộn hai kiểu nhấn Esc",
           content:
-            "Nhấn Esc MỘT lần = dừng việc AI đang làm. Nhấn Esc HAI lần (khi khung trống) = mở lịch sử để quay lại. Tùy phiên bản Claude Code cách gọi có thể hơi khác — cứ thử trong lúc học.",
+            "Nhấn Esc MỘT lần là dừng việc AI đang làm. Nhấn Esc HAI lần (lúc khung chat trống) là mở lịch sử để quay lại. Tùy bản Claude Code cách gọi có thể hơi khác — bạn cứ thử trong lúc học là quen.",
         },
       ],
     },
     {
       id: "m2-b8",
-      title: "Ghép lại thành một thói quen + checklist tự nhắc",
-      description: "Buộc tất cả lại thành phản xạ dùng mỗi ngày.",
+      title: "Gói lại thành thói quen — tấm bảng dán cạnh máy",
+      description: "Buộc hết mọi thứ lại thành phản xạ dùng mỗi ngày.",
       duration: "8 phút",
-      videoLabel: "Sợi chỉ đỏ của cả Module 2",
+      videoLabel: "Sợi chỉ đỏ xuyên suốt cả Module 2",
       main: [
         {
           type: "card",
           title: "Sợi chỉ đỏ",
           body: [
-            "Tất cả những gì bạn học ở module này gói lại thành một câu:",
-            "Chat ngắn + việc nhỏ + prompt rõ + dọn bàn thường xuyên + kiểm tra mỗi bước + lưu điểm (commit). Vừa cho kết quả tốt nhất, vừa tốn ít token nhất.",
+            "Tất cả những gì học ở module này gói gọn lại trong một câu:",
+            "Chat ngắn, việc nhỏ, prompt rõ, dọn bàn cho thường, kiểm tra sau mỗi bước, và nhớ lưu điểm (commit). Vừa cho kết quả ngon nhất, vừa tốn ít token nhất.",
           ],
         },
         {
           type: "card",
-          title: "Checklist trước khi nhấn Enter",
+          title: "Ngó qua trước khi nhấn Enter",
           list: [
-            "Việc này là cuộc trò chuyện MỚI hay tiếp tục? (mới, khác việc → /clear)",
-            "Prompt đã cụ thể và có “xong nghĩa là gì” chưa?",
-            "Tin nhắn này chỉ có MỘT việc chứ?",
-            "Việc lớn → đã nhấn Shift + Tab để duyệt kế hoạch chưa?",
+            "Việc này là cuộc trò chuyện MỚI hay làm tiếp cái cũ? (mới, khác việc thì /clear)",
+            "Prompt đã đủ cụ thể, đã nói rõ “xong là thế nào” chưa?",
+            "Tin nhắn này có đúng một việc thôi chứ?",
+            "Việc lớn thì đã Shift + Tab xem kế hoạch trước chưa?",
             "Xong rồi mình sẽ kiểm tra bằng cách nào?",
           ],
         },
         {
           type: "note",
           tone: "success",
-          label: "Bước tiếp theo",
+          label: "Bước kế tiếp",
           content:
-            "Xong phần chuẩn bị! Ở Module 3, bạn sẽ chạy đúng quy trình này lần đầu để có một landing page thật ngay trên máy.",
+            "Xong phần chuẩn bị rồi! Qua Module 3, bạn sẽ chạy đúng cái quy trình này lần đầu để có một landing page thật ngay trên máy.",
         },
       ],
       aside: [
@@ -553,19 +554,19 @@ Brief của tôi:
           list: [
             "❌ Một chat cả ngày → ✅ /clear khi đổi việc",
             "❌ Dán cả file → ✅ dùng @tên-file",
-            "❌ Nhồi nhiều việc → ✅ một tin nhắn một việc",
-            "❌ “Làm đẹp hơn” → ✅ nói cụ thể + tiêu chí xong",
-            "❌ Cho AI tự thêm tính năng → ✅ “hỏi tôi trước”",
-            "❌ Bỏ qua Plan Mode → ✅ Shift + Tab duyệt trước",
+            "❌ Nhồi nhiều việc một lúc → ✅ một tin nhắn một việc",
+            "❌ “Làm đẹp hơn” → ✅ nói cụ thể + nói rõ xong là sao",
+            "❌ Để AI tự thêm tính năng → ✅ “muốn thêm gì hỏi tôi trước”",
+            "❌ Bỏ qua Plan Mode → ✅ Shift + Tab xem trước",
             "❌ Quên lưu điểm → ✅ commit sau mỗi việc xong",
           ],
         },
         {
           type: "note",
           tone: "info",
-          label: "In ra dùng trong tuần đầu",
+          label: "In ra xài trong tuần đầu",
           content:
-            "Bảng này đáng in ra dán cạnh màn hình. Tuần đầu làm theo, vài hôm là thành phản xạ.",
+            "Tấm bảng này đáng in ra dán cạnh màn hình. Tuần đầu cứ làm theo, vài bữa là thành phản xạ.",
         },
       ],
     },
