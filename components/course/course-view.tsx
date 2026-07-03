@@ -1,8 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, CheckCircle2, ChevronDown, MessageCircle, PlayCircle, Target } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  MessageCircle,
+  PlayCircle,
+  Sparkles,
+  Target,
+  Trophy,
+} from "lucide-react";
 import { LessonBlockView } from "@/components/course/lesson-blocks";
 import { lessonKey, useCourseProgress } from "@/components/course/use-course-progress";
 import { cn } from "@/lib/utils";
@@ -28,6 +39,11 @@ interface CourseViewProps {
   modules?: CourseDocModule[];
 }
 
+/** ID phần tử để cuộn mượt tới đầu một bài học khi điều hướng. */
+function lessonDomId(moduleId: string, lessonId: string) {
+  return `lesson-${moduleId}-${lessonId}`;
+}
+
 /** Tiến độ hoàn thành của một module (số bài đã học / tổng số bài). */
 function getModuleStats(module: CourseDocModule, completed: Set<string>) {
   const total = module.lessons.length;
@@ -36,6 +52,18 @@ function getModuleStats(module: CourseDocModule, completed: Set<string>) {
     0,
   );
   return { total, done, percent: total ? Math.round((done / total) * 100) : 0 };
+}
+
+/** Bài học chưa hoàn thành đầu tiên (theo thứ tự module → bài) để "học tiếp". */
+function findNextLesson(modules: CourseDocModule[], completed: Set<string>) {
+  for (const m of modules) {
+    for (const l of m.lessons) {
+      if (!completed.has(lessonKey(m.id, l.id))) {
+        return { moduleId: m.id, lessonId: l.id, lessonTitle: l.title };
+      }
+    }
+  }
+  return null;
 }
 
 /**
@@ -49,14 +77,44 @@ export function CourseView({
   modules = courseModules,
 }: CourseViewProps) {
   const [activeModuleId, setActiveModuleId] = useState(modules[0]?.id ?? "");
+  const [openLessonId, setOpenLessonId] = useState<string | null>(
+    modules[0]?.lessons[0]?.id ?? null,
+  );
   const { completed, toggle } = useCourseProgress();
-  const activeModule =
-    modules.find((m) => m.id === activeModuleId) ?? modules[0];
+
+  const activeIndex = Math.max(
+    0,
+    modules.findIndex((m) => m.id === activeModuleId),
+  );
+  const activeModule = modules[activeIndex] ?? modules[0];
+  const nextModule = modules[activeIndex + 1] ?? null;
+
+  /** Cuộn mượt tới đầu một bài sau khi DOM đã cập nhật. */
+  const scrollToLesson = (moduleId: string, lessonId: string) => {
+    if (typeof document === "undefined") return;
+    requestAnimationFrame(() => {
+      document
+        .getElementById(lessonDomId(moduleId, lessonId))
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   const selectModule = (id: string) => {
     setActiveModuleId(id);
+    const target = modules.find((m) => m.id === id);
+    setOpenLessonId(target?.lessons[0]?.id ?? null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  /** Mở đúng một bài (có thể ở module khác) và cuộn tới nó. */
+  const openLesson = (moduleId: string, lessonId: string) => {
+    setActiveModuleId(moduleId);
+    setOpenLessonId(lessonId);
+    scrollToLesson(moduleId, lessonId);
+  };
+
+  const toggleLessonOpen = (lessonId: string) =>
+    setOpenLessonId((current) => (current === lessonId ? null : lessonId));
 
   const totalLessons = modules.reduce((n, m) => n + m.lessons.length, 0);
   const doneLessons = modules.reduce(
@@ -66,6 +124,10 @@ export function CourseView({
   const overallPercent = totalLessons
     ? Math.round((doneLessons / totalLessons) * 100)
     : 0;
+  const nextUp = useMemo(
+    () => findNextLesson(modules, completed),
+    [modules, completed],
+  );
 
   const body = (
     <div
@@ -76,7 +138,7 @@ export function CourseView({
     >
       <ModuleSidebar
         modules={modules}
-        activeModuleId={activeModuleId}
+        activeModuleId={activeModule?.id ?? ""}
         completed={completed}
         onSelect={selectModule}
       />
@@ -85,11 +147,12 @@ export function CourseView({
         <section className="premium-dark relative overflow-hidden rounded-3xl border border-white/10 px-6 py-8 text-white sm:px-8">
           <div className="noise absolute inset-0" aria-hidden />
           <div className="relative">
-            <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold">
+              <Sparkles className="h-3.5 w-3.5 text-accent-strong" aria-hidden />
               {courseContent.badge}
             </span>
             <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl">
-              {courseContent.heroTitle}
+              Xin chào, {studentName} 👋
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
               {courseContent.heroDescription}
@@ -116,6 +179,37 @@ export function CourseView({
                 />
               </div>
             </div>
+
+            {nextUp ? (
+              <button
+                type="button"
+                onClick={() => openLesson(nextUp.moduleId, nextUp.lessonId)}
+                className="group mt-5 flex w-full max-w-md items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] px-4 py-3 text-left transition hover:border-white/30 hover:bg-white/[0.12]"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
+                  <PlayCircle className="h-5 w-5" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-bold uppercase tracking-[0.08em] text-white/60">
+                    {doneLessons > 0 ? "Tiếp tục học" : "Bắt đầu học"}
+                  </span>
+                  <span className="block truncate text-sm font-bold text-white">
+                    {nextUp.lessonTitle}
+                  </span>
+                </span>
+                <ArrowRight
+                  className="h-4 w-4 shrink-0 text-white/70 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </button>
+            ) : (
+              <div className="mt-5 flex max-w-md items-center gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-emerald-100">
+                <Trophy className="h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
+                <p className="text-sm font-bold">
+                  Bạn đã hoàn thành toàn bộ khóa học. Xuất sắc! 🎉
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -123,8 +217,15 @@ export function CourseView({
           <ModuleContent
             key={activeModule.id}
             module={activeModule}
+            moduleIndex={activeIndex}
+            totalModules={modules.length}
             completed={completed}
+            openLessonId={openLessonId}
+            nextModule={nextModule}
+            onToggleOpen={toggleLessonOpen}
             onToggleLesson={toggle}
+            onOpenLesson={openLesson}
+            onSelectModule={selectModule}
           />
         ) : (
           <p className="mt-6 rounded-3xl border border-dashed border-white/15 p-10 text-center text-sm text-muted-foreground">
@@ -192,7 +293,7 @@ function ModuleSidebar({
         aria-label="Danh sách module"
         className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
       >
-        {modules.map((module) => {
+        {modules.map((module, index) => {
           const active = module.id === activeModuleId;
           const stats = getModuleStats(module, completed);
           const finished = stats.total > 0 && stats.done === stats.total;
@@ -210,14 +311,32 @@ function ModuleSidebar({
               )}
             >
               <span className="flex items-center gap-2">
-                <span className={cn("min-w-0 flex-1 truncate text-sm font-bold", active && "text-primary")}>
+                <span
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] font-bold tabular-nums",
+                    finished
+                      ? "bg-emerald-500/20 text-emerald-300"
+                      : active
+                        ? "bg-primary/25 text-primary"
+                        : "bg-white/10 text-muted-foreground",
+                  )}
+                >
+                  {finished ? (
+                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                  ) : (
+                    index + 1
+                  )}
+                </span>
+                <span
+                  className={cn(
+                    "min-w-0 flex-1 truncate text-sm font-bold",
+                    active && "text-primary",
+                  )}
+                >
                   {module.shortTitle}
                 </span>
-                {finished && (
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
-                )}
               </span>
-              <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+              <span className="mt-0.5 block truncate pl-7 text-xs text-muted-foreground">
                 {module.tagline}
               </span>
               <span className="mt-2.5 flex items-center gap-2">
@@ -247,28 +366,45 @@ function ModuleSidebar({
 /** Nội dung một module: phần đầu + danh sách bài học accordion. */
 function ModuleContent({
   module,
+  moduleIndex,
+  totalModules,
   completed,
+  openLessonId,
+  nextModule,
+  onToggleOpen,
   onToggleLesson,
+  onOpenLesson,
+  onSelectModule,
 }: {
   module: CourseDocModule;
+  moduleIndex: number;
+  totalModules: number;
   completed: Set<string>;
+  openLessonId: string | null;
+  nextModule: CourseDocModule | null;
+  onToggleOpen: (lessonId: string) => void;
   onToggleLesson: (key: string) => void;
+  onOpenLesson: (moduleId: string, lessonId: string) => void;
+  onSelectModule: (id: string) => void;
 }) {
-  // Mặc định mở bài đầu tiên của module
-  const [openLessonId, setOpenLessonId] = useState<string | null>(
-    module.lessons[0]?.id ?? null,
-  );
   const stats = getModuleStats(module, completed);
+  const finished = stats.total > 0 && stats.done === stats.total;
 
   return (
     <section className="mt-6">
       <div className="card-surface rounded-3xl p-6 sm:p-7">
-        <h2 className="text-xl font-extrabold sm:text-2xl">{module.title}</h2>
+        <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-accent-strong">
+          Module {moduleIndex + 1} / {totalModules}
+        </span>
+        <h2 className="mt-1.5 text-xl font-extrabold sm:text-2xl">{module.title}</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {module.description}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <MetaPill icon={<Target className="h-3.5 w-3.5" aria-hidden />} text={`Kết quả: ${module.outcome}`} />
+          <MetaPill
+            icon={<Target className="h-3.5 w-3.5" aria-hidden />}
+            text={`Kết quả: ${module.outcome}`}
+          />
         </div>
 
         <div className="mt-5 rounded-2xl border border-white/10 bg-background/40 p-4">
@@ -289,7 +425,7 @@ function ModuleContent({
             <div
               className={cn(
                 "h-full rounded-full transition-[width] duration-500 ease-out",
-                stats.done === stats.total && stats.total > 0
+                finished
                   ? "bg-emerald-400"
                   : "bg-gradient-to-r from-primary to-accent",
               )}
@@ -302,22 +438,91 @@ function ModuleContent({
       <div className="mt-4 space-y-3.5">
         {module.lessons.map((lesson, index) => {
           const key = lessonKey(module.id, lesson.id);
+          const nextLesson = module.lessons[index + 1] ?? null;
+          const prevLesson = module.lessons[index - 1] ?? null;
           return (
             <LessonCard
               key={lesson.id}
+              domId={lessonDomId(module.id, lesson.id)}
               lesson={lesson}
               index={index}
+              total={module.lessons.length}
               open={openLessonId === lesson.id}
               complete={completed.has(key)}
-              onToggle={() =>
-                setOpenLessonId((current) => (current === lesson.id ? null : lesson.id))
-              }
+              onToggle={() => onToggleOpen(lesson.id)}
               onToggleComplete={() => onToggleLesson(key)}
+              onPrev={
+                prevLesson
+                  ? () => onOpenLesson(module.id, prevLesson.id)
+                  : undefined
+              }
+              onNext={
+                nextLesson
+                  ? () => {
+                      if (!completed.has(key)) onToggleLesson(key);
+                      onOpenLesson(module.id, nextLesson.id);
+                    }
+                  : undefined
+              }
             />
           );
         })}
       </div>
+
+      {finished ? (
+        <ModuleDoneCard
+          nextModule={nextModule}
+          onSelectModule={onSelectModule}
+        />
+      ) : null}
     </section>
+  );
+}
+
+/** Card chúc mừng khi học xong toàn bộ bài trong module. */
+function ModuleDoneCard({
+  nextModule,
+  onSelectModule,
+}: {
+  nextModule: CourseDocModule | null;
+  onSelectModule: (id: string) => void;
+}) {
+  return (
+    <div className="mt-4 flex flex-col items-start gap-4 rounded-3xl border border-emerald-400/30 bg-emerald-400/[0.08] p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300">
+          <CheckCircle2 className="h-6 w-6" aria-hidden />
+        </span>
+        <div>
+          <p className="text-base font-extrabold text-emerald-100">
+            Hoàn thành module — làm tốt lắm! 🎉
+          </p>
+          <p className="mt-0.5 text-sm text-emerald-200/80">
+            {nextModule
+              ? "Sẵn sàng cho module tiếp theo chưa?"
+              : "Đây là module cuối cùng của khóa học."}
+          </p>
+        </div>
+      </div>
+      {nextModule ? (
+        <button
+          type="button"
+          onClick={() => onSelectModule(nextModule.id)}
+          className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+        >
+          Học module tiếp theo
+          <ArrowRight
+            className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </button>
+      ) : (
+        <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-emerald-500/15 px-5 py-2.5 text-sm font-bold text-emerald-200">
+          <Trophy className="h-4 w-4" aria-hidden />
+          Hoàn thành khóa học
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -332,24 +537,33 @@ function MetaPill({ icon, text }: { icon: React.ReactNode; text: string }) {
 
 /** Một bài học dạng accordion, kèm nút đánh dấu đã học xong. */
 function LessonCard({
+  domId,
   lesson,
   index,
+  total,
   open,
   complete,
   onToggle,
   onToggleComplete,
+  onPrev,
+  onNext,
 }: {
+  domId: string;
   lesson: CourseLesson;
   index: number;
+  total: number;
   open: boolean;
   complete: boolean;
   onToggle: () => void;
   onToggleComplete: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   return (
     <article
+      id={domId}
       className={cn(
-        "card-surface overflow-hidden rounded-2xl transition-colors",
+        "card-surface scroll-mt-24 overflow-hidden rounded-2xl transition-colors",
         complete && "border-emerald-400/30",
       )}
     >
@@ -363,24 +577,19 @@ function LessonCard({
               ? `Bỏ đánh dấu bài ${index + 1}`
               : `Đánh dấu bài ${index + 1} đã học xong`
           }
-          title={complete ? "Đã học xong — bấm để bỏ đánh dấu" : "Bấm để đánh dấu đã học xong"}
-          className={cn(
-            "group/badge flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-extrabold transition",
+          title={
             complete
-              ? "bg-emerald-500/90 text-white shadow-glow"
-              : "bg-primary/15 text-primary hover:bg-primary/25",
+              ? "Đã học xong — bấm để bỏ đánh dấu"
+              : "Bấm để đánh dấu đã học xong"
+          }
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition",
+            complete
+              ? "border-emerald-400 bg-emerald-500/90 text-white shadow-glow"
+              : "border-white/20 text-transparent hover:border-primary hover:text-primary/70",
           )}
         >
-          {complete ? (
-            <Check className="h-5 w-5" aria-hidden />
-          ) : (
-            <>
-              <span className="group-hover/badge:hidden">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <Check className="hidden h-5 w-5 group-hover/badge:block" aria-hidden />
-            </>
-          )}
+          <Check className="h-4 w-4" aria-hidden />
         </button>
 
         <button
@@ -390,8 +599,16 @@ function LessonCard({
           className="flex min-w-0 flex-1 items-center gap-3 text-left"
         >
           <span className="min-w-0 flex-1">
-            <h3 className="text-[15px] font-bold leading-snug sm:text-base">{lesson.title}</h3>
-            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{lesson.description}</p>
+            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+              Bài {index + 1}
+              <span className="opacity-50"> / {total}</span>
+            </span>
+            <h3 className="text-[15px] font-bold leading-snug sm:text-base">
+              {lesson.title}
+            </h3>
+            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+              {lesson.description}
+            </p>
           </span>
           <ChevronDown
             className={cn(
@@ -452,30 +669,62 @@ function LessonCard({
             ) : null}
           </div>
 
-          <div className="mt-6 border-t border-white/10 pt-5">
-            <button
-              type="button"
-              onClick={onToggleComplete}
-              aria-pressed={complete}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition",
-                complete
-                  ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
-                  : "bg-gradient-to-r from-primary to-accent text-white hover:opacity-90",
-              )}
-            >
-              {complete ? (
-                <>
-                  <CheckCircle2 className="h-4 w-4" aria-hidden />
-                  Đã hoàn thành — bấm để bỏ đánh dấu
-                </>
-              ) : (
-                <>
-                  <Check className="h-4 w-4" aria-hidden />
-                  Đánh dấu đã học xong
-                </>
-              )}
-            </button>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+            {onPrev ? (
+              <button
+                type="button"
+                onClick={onPrev}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-white/25 hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden />
+                Bài trước
+              </button>
+            ) : (
+              <span />
+            )}
+
+            {onNext ? (
+              <button
+                type="button"
+                onClick={onNext}
+                className={cn(
+                  "group inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white transition hover:opacity-90",
+                  complete
+                    ? "bg-white/10 text-foreground hover:bg-white/15"
+                    : "bg-gradient-to-r from-primary to-accent",
+                )}
+              >
+                {complete ? "Học bài tiếp theo" : "Hoàn thành & học tiếp"}
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onToggleComplete}
+                aria-pressed={complete}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition",
+                  complete
+                    ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                    : "bg-gradient-to-r from-primary to-accent text-white hover:opacity-90",
+                )}
+              >
+                {complete ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    Đã hoàn thành — bấm để bỏ đánh dấu
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" aria-hidden />
+                    Đánh dấu đã học xong
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       ) : null}
