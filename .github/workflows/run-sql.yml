@@ -1,0 +1,55 @@
+name: Run SQL on Supabase
+
+# Mỗi khi push lên main mà có đổi file SQL → tự chạy SQL lên Supabase.
+# (Vercel tự lo phần deploy code, nên workflow này CHỈ lo phần database.)
+#
+# Yêu cầu cấu hình 1 lần trong GitHub repo:
+#   Settings → Secrets and variables → Actions
+#     • Secret:   SUPABASE_ACCESS_TOKEN   = sbp_...   (https://supabase.com/dashboard/account/tokens)
+#     • Variable: NEXT_PUBLIC_SUPABASE_URL = https://<project-ref>.supabase.co
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/**.sql"
+      - "scripts/run-sql.mjs"
+      - ".github/workflows/run-sql.yml"
+  workflow_dispatch: {} # cho phép bấm chạy tay từ tab Actions
+
+# Không chạy chồng: nếu push liên tiếp, huỷ lượt cũ đang chạy.
+concurrency:
+  group: run-sql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-sql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Guard — kiểm tra secret đã cấu hình chưa
+        id: guard
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$URL" ]; then
+            echo "::warning::Bỏ qua chạy SQL — chưa cấu hình SUPABASE_ACCESS_TOKEN (secret) và/hoặc NEXT_PUBLIC_SUPABASE_URL (variable) trong repo settings."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Chạy SQL lên Supabase
+        if: steps.guard.outputs.ok == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        run: node scripts/run-sql.mjs
