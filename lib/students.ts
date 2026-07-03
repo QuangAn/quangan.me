@@ -20,9 +20,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // Mã Postgres khi vi phạm unique constraint (trùng order_id/email).
 const PG_UNIQUE_VIOLATION = "23505";
 
-/** Cột trả về cho admin — KHÔNG bao giờ gồm password_hash. */
+/**
+ * Cột trả về cho admin — KHÔNG bao giờ gồm password_hash. Có kèm temp_password
+ * (mật khẩu tạm dạng phẳng) để admin cấp/gửi tay cho học viên khi email lỗi.
+ */
 const PUBLIC_COLUMNS =
-  "id, order_id, email, full_name, phone, plan_id, plan_name, must_change_password, status, welcome_email_status, welcome_email_error, welcome_email_sent_at, last_login_at, created_at";
+  "id, order_id, email, full_name, phone, plan_id, plan_name, temp_password, must_change_password, status, welcome_email_status, welcome_email_error, welcome_email_sent_at, last_login_at, created_at";
 
 export interface ProvisionResult {
   ok: boolean;
@@ -171,6 +174,7 @@ export async function provisionStudentForOrder(
       plan_id: order.plan_id,
       plan_name: order.plan_name,
       password_hash: passwordHash,
+      temp_password: tempPassword,
       must_change_password: true,
       status: "active",
       welcome_email_status: "pending",
@@ -353,6 +357,8 @@ export async function changeStudentPassword(
     .from("student_accounts")
     .update({
       password_hash: hash,
+      // Học viên đã đặt mật khẩu riêng → xóa mật khẩu tạm, admin không xem nữa.
+      temp_password: null,
       must_change_password: false,
       password_changed_at: new Date().toISOString(),
     })
@@ -410,9 +416,13 @@ export async function listStudentAccounts(
 }
 
 /** Đặt lại mật khẩu (tạo mật khẩu tạm mới) và gửi lại email cho học viên. */
-export async function resetStudentPasswordAndEmail(
-  id: string,
-): Promise<{ ok: boolean; emailStatus?: WelcomeEmailStatus; error?: string }> {
+export async function resetStudentPasswordAndEmail(id: string): Promise<{
+  ok: boolean;
+  emailStatus?: WelcomeEmailStatus;
+  /** Mật khẩu tạm mới (dạng phẳng) để admin hiển thị/gửi tay ngay. */
+  password?: string;
+  error?: string;
+}> {
   const supabase = getSupabaseServiceClient();
   if (!supabase) return { ok: false, error: "supabase-not-configured" };
 
@@ -433,6 +443,7 @@ export async function resetStudentPasswordAndEmail(
     .from("student_accounts")
     .update({
       password_hash: hash,
+      temp_password: tempPassword,
       must_change_password: true,
       password_changed_at: new Date().toISOString(),
     })
@@ -449,7 +460,7 @@ export async function resetStudentPasswordAndEmail(
   });
   const emailStatus = await recordEmailStatus(supabase, id, emailResult);
 
-  return { ok: true, emailStatus };
+  return { ok: true, emailStatus, password: tempPassword };
 }
 
 /** Bật/khóa tài khoản học viên. Tài khoản khóa không đăng nhập được. */
@@ -548,6 +559,8 @@ export async function createStudentAccount(
   ok: boolean;
   accountId?: string;
   emailStatus?: WelcomeEmailStatus;
+  /** Mật khẩu tạm (dạng phẳng) để admin hiển thị/gửi tay ngay. */
+  password?: string;
   error?: string;
 }> {
   const supabase = getSupabaseServiceClient();
@@ -574,6 +587,7 @@ export async function createStudentAccount(
       plan_id: plan.id,
       plan_name: plan.name,
       password_hash: passwordHash,
+      temp_password: tempPassword,
       must_change_password: true,
       status: "active",
       welcome_email_status: willSend ? "pending" : "skipped",
@@ -591,8 +605,9 @@ export async function createStudentAccount(
 
   const accountId = (inserted as { id: string }).id;
   if (!willSend) {
-    // Chưa gửi email → admin có thể bấm "Đặt lại & gửi" để cấp mật khẩu sau.
-    return { ok: true, accountId, emailStatus: "skipped" };
+    // Chưa gửi email → admin xem mật khẩu ở cột "Mật khẩu tạm" hoặc bấm
+    // "Đặt lại & gửi" để cấp lại sau.
+    return { ok: true, accountId, emailStatus: "skipped", password: tempPassword };
   }
 
   const emailResult = await sendEmail({
@@ -605,7 +620,7 @@ export async function createStudentAccount(
     }),
   });
   const emailStatus = await recordEmailStatus(supabase, accountId, emailResult);
-  return { ok: true, accountId, emailStatus };
+  return { ok: true, accountId, emailStatus, password: tempPassword };
 }
 
 export interface UpdateStudentInput {

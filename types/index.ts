@@ -204,6 +204,8 @@ export interface StudentAccount {
   phone: string | null;
   plan_id: PlanId;
   plan_name: string | null;
+  /** Mật khẩu tạm dạng phẳng (chỉ trả về cho admin). Null khi học viên đã tự đổi. */
+  temp_password?: string | null;
   must_change_password: boolean;
   status: StudentAccountStatus;
   welcome_email_status: WelcomeEmailStatus;

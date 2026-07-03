@@ -80,5 +80,6 @@ export async function POST(req: NextRequest) {
     ok: true,
     id: result.accountId,
     emailStatus: result.emailStatus,
+    password: result.password,
   });
 }

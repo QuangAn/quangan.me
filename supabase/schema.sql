@@ -129,6 +129,9 @@ create table if not exists public.student_accounts (
   plan_name text,
   -- Định dạng: scrypt$N$r$p$saltB64$hashB64
   password_hash text not null,
+  -- Mật khẩu tạm dạng phẳng để admin xem/gửi tay khi email chưa gửi được.
+  -- Chỉ đọc qua service role ở server; xóa (null) ngay khi học viên tự đổi mật khẩu.
+  temp_password text,
   -- true khi vẫn dùng mật khẩu tạm hệ thống cấp (khuyến khích đổi)
   must_change_password boolean not null default true,
   status text not null default 'active' check (status in ('active', 'disabled')),
@@ -142,6 +145,11 @@ create table if not exists public.student_accounts (
   password_changed_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+-- Migration bổ sung (chạy lại nhiều lần an toàn): cột mật khẩu tạm để admin
+-- xem/cấp lại cho DB đã tạo trước khi có tính năng này.
+alter table public.student_accounts
+  add column if not exists temp_password text;
 
 alter table public.student_accounts enable row level security;
 -- Không tạo policy public — mọi truy cập đi qua service role ở server.

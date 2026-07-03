@@ -49,7 +49,11 @@ export async function POST(
         { status: code },
       );
     }
-    return NextResponse.json({ ok: true, emailStatus: result.emailStatus });
+    return NextResponse.json({
+      ok: true,
+      emailStatus: result.emailStatus,
+      password: result.password,
+    });
   }
 
   if (action === "set_status") {

@@ -20,6 +20,10 @@ import {
   Plus,
   Pencil,
   Trash2,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
 } from "lucide-react";
 import {
   AccountFormModal,
@@ -66,6 +70,8 @@ export default function AccountsPage() {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const [actingId, setActingId] = useState<string | null>(null);
+  const [revealedId, setRevealedId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [editing, setEditing] = useState<StudentAccount | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<StudentAccount | null>(null);
@@ -117,12 +123,16 @@ export default function AccountsPage() {
 
       let msg = successMsg;
       if (body.action === "reset_password" && data.emailStatus) {
+        const pw = data.password ? ` Mật khẩu mới: ${data.password}` : "";
         msg =
           data.emailStatus === "sent"
-            ? "Đã đặt lại mật khẩu và gửi email cho học viên."
-            : "Đã đặt lại mật khẩu, nhưng email chưa gửi được (kiểm tra cấu hình email).";
+            ? "Đã đặt lại mật khẩu và gửi email cho học viên." + pw
+            : "Đã đặt lại mật khẩu. Email chưa gửi được — xem/copy mật khẩu ở cột “Mật khẩu tạm” để gửi tay cho học viên." +
+              pw;
       }
       setMessage(msg);
+      // Hiện sẵn mật khẩu mới trên hàng vừa đặt lại để admin copy ngay.
+      if (body.action === "reset_password") setRevealedId(id);
       await fetchAccounts();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Thao tác thất bại");
@@ -166,17 +176,22 @@ export default function AccountsPage() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) return data.error || "Thao tác thất bại.";
 
+      const pw = data.password ? ` Mật khẩu: ${data.password}` : "";
       if (isEdit) {
         setMessage("Đã cập nhật tài khoản.");
       } else if (data.emailStatus === "sent") {
-        setMessage("Đã tạo tài khoản và gửi email đăng nhập cho học viên.");
+        setMessage(
+          "Đã tạo tài khoản và gửi email đăng nhập cho học viên." + pw,
+        );
       } else if (data.emailStatus === "skipped") {
         setMessage(
-          "Đã tạo tài khoản (chưa gửi email). Bấm “Đặt lại & gửi” để cấp mật khẩu cho học viên.",
+          "Đã tạo tài khoản (chưa gửi email). Mật khẩu hiển thị ở cột “Mật khẩu tạm” để bạn gửi cho học viên." +
+            pw,
         );
       } else {
         setMessage(
-          "Đã tạo tài khoản, nhưng email chưa gửi được (kiểm tra cấu hình email).",
+          "Đã tạo tài khoản, nhưng email chưa gửi được — xem mật khẩu ở cột “Mật khẩu tạm”." +
+            pw,
         );
       }
       await fetchAccounts();
@@ -213,6 +228,17 @@ export default function AccountsPage() {
       setError(err instanceof Error ? err.message : "Không xóa được.");
     } finally {
       setDeleteTarget(null);
+    }
+  };
+
+  const copyPassword = async (id: string, password: string) => {
+    try {
+      await navigator.clipboard.writeText(password);
+      setRevealedId(id);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 2000);
+    } catch {
+      /* clipboard bị chặn — bỏ qua, admin vẫn có thể xem bằng nút hiện */
     }
   };
 
@@ -300,6 +326,9 @@ export default function AccountsPage() {
                   Học viên
                 </th>
                 <th className="text-left py-4 px-6 text-sm font-medium text-slate-400">
+                  Mật khẩu tạm
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-slate-400">
                   Gói
                 </th>
                 <th className="text-left py-4 px-6 text-sm font-medium text-slate-400">
@@ -322,7 +351,7 @@ export default function AccountsPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={8} className="py-8 text-center text-slate-500">
                     Đang tải...
                   </td>
                 </tr>
@@ -345,6 +374,59 @@ export default function AccountsPage() {
                           </span>
                         )}
                       </td>
+                      <td className="py-4 px-6 text-sm">
+                        {acc.temp_password ? (
+                          <div className="flex items-center gap-2">
+                            <code className="font-mono text-slate-200">
+                              {revealedId === acc.id
+                                ? acc.temp_password
+                                : "••••••••"}
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setRevealedId((cur) =>
+                                  cur === acc.id ? null : acc.id,
+                                )
+                              }
+                              className="text-slate-500 transition-colors hover:text-slate-300"
+                              title={
+                                revealedId === acc.id
+                                  ? "Ẩn mật khẩu"
+                                  : "Hiện mật khẩu"
+                              }
+                            >
+                              {revealedId === acc.id ? (
+                                <EyeOff className="w-4 h-4" />
+                              ) : (
+                                <Eye className="w-4 h-4" />
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                copyPassword(acc.id, acc.temp_password!)
+                              }
+                              className="text-slate-500 transition-colors hover:text-slate-300"
+                              title="Sao chép mật khẩu"
+                            >
+                              {copiedId === acc.id ? (
+                                <Check className="w-4 h-4 text-green-400" />
+                              ) : (
+                                <Copy className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        ) : acc.must_change_password ? (
+                          <span className="text-xs text-slate-500">
+                            — bấm “Đặt lại &amp; gửi”
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-500">
+                            Học viên đã đổi
+                          </span>
+                        )}
+                      </td>
                       <td className="py-4 px-6 text-sm text-slate-300">
                         {acc.plan_name ?? acc.plan_id}
                       </td>
@@ -360,6 +442,12 @@ export default function AccountsPage() {
                       <td className="py-4 px-6 text-sm">
                         <span
                           className={`inline-flex items-center gap-1.5 ${meta.className}`}
+                          title={
+                            acc.welcome_email_status === "failed" &&
+                            acc.welcome_email_error
+                              ? `Lỗi gửi email: ${acc.welcome_email_error}`
+                              : meta.label
+                          }
                         >
                           <EmailIcon className="w-4 h-4" />
                           {meta.label}
@@ -447,7 +535,7 @@ export default function AccountsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={8} className="py-8 text-center text-slate-500">
                     Chưa có tài khoản học viên nào
                   </td>
                 </tr>
@@ -483,15 +571,34 @@ export default function AccountsPage() {
         )}
       </Card>
 
-      <Card className="border-slate-700 bg-slate-800/50 p-6 text-sm text-slate-300">
-        <p className="mb-2">
+      <Card className="border-slate-700 bg-slate-800/50 p-6 text-sm text-slate-300 space-y-2">
+        <p>
           <strong>Ghi chú:</strong> Tài khoản được tạo tự động khi đơn hàng
           chuyển sang <span className="text-green-400">đã thanh toán</span>, kèm
-          email gửi thông tin đăng nhập. Nếu cột &quot;Email cấp TK&quot; báo
-          lỗi/chưa gửi, hãy cấu hình email (RESEND_API_KEY) rồi bấm
-          &quot;Đặt lại &amp; gửi&quot; để gửi lại cho học viên. Bạn cũng có thể
-          bấm <span className="text-white">&quot;Thêm tài khoản&quot;</span> để
-          tạo thủ công.
+          email gửi thông tin đăng nhập. Bạn cũng có thể bấm{" "}
+          <span className="text-white">&quot;Thêm tài khoản&quot;</span> để tạo
+          thủ công.
+        </p>
+        <p>
+          Cột <span className="text-white">&quot;Mật khẩu tạm&quot;</span> hiển
+          thị mật khẩu đăng nhập hệ thống tự tạo — bấm{" "}
+          <Eye className="inline w-3.5 h-3.5" /> để xem,{" "}
+          <Copy className="inline w-3.5 h-3.5" /> để sao chép và gửi tay cho học
+          viên (kể cả khi email chưa gửi được). Mật khẩu tự ẩn ngay khi học viên
+          tự đổi.
+        </p>
+        <p>
+          Muốn email tự gửi: đặt biến môi trường{" "}
+          <code className="bg-slate-900/50 px-1.5 py-0.5 rounded text-cyan-300">
+            RESEND_API_KEY
+          </code>{" "}
+          và{" "}
+          <code className="bg-slate-900/50 px-1.5 py-0.5 rounded text-cyan-300">
+            EMAIL_FROM
+          </code>{" "}
+          (domain đã verify ở Resend) trên Vercel, rồi bấm &quot;Đặt lại &amp;
+          gửi&quot;. Rê chuột vào cột &quot;Email cấp TK&quot; khi báo lỗi để xem
+          chi tiết.
         </p>
       </Card>
 
