@@ -2,21 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-<<<<<<< HEAD
-import {
-  ArrowLeft,
-  Check,
-  CheckCircle2,
-  ChevronDown,
-  Clock,
-  Gauge,
-  MessageCircle,
-  PlayCircle,
-  Target,
-} from "lucide-react";
-=======
-import { ArrowLeft, ChevronDown, MessageCircle, PlayCircle, Target } from "lucide-react";
->>>>>>> e7d51c0f0b0ad2a93f1966b058fa90b47148e10a
+import { ArrowLeft, Check, CheckCircle2, ChevronDown, MessageCircle, PlayCircle, Target } from "lucide-react";
 import { LessonBlockView } from "@/components/course/lesson-blocks";
 import { lessonKey, useCourseProgress } from "@/components/course/use-course-progress";
 import { cn } from "@/lib/utils";
