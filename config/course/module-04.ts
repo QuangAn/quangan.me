@@ -168,7 +168,7 @@ Business Brief:
         {
           type: "prompt",
           title: "Prompt đọc document và lập kế hoạch",
-          prompt: `Hãy đọc toàn bộ document trong project (PROJECT.md, PRD.md, UI_UX_SPEC.md, DATABASE.md, TASKS.md, CLAUDE.md).
+          prompt: `Hãy đọc các document trong project (PROJECT.md, PRD.md, UI_UX_SPEC.md, DATABASE.md, TASKS.md). CLAUDE.md thì Claude Code tự đọc mỗi phiên, không cần liệt kê.
 
 Sau đó:
 1. Tóm tắt lại bạn hiểu dự án như thế nào
