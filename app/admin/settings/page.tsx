@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { getAdminToken } from "@/lib/admin-auth";
+import { adminFetch } from "@/lib/admin-auth";
 import { Copy, Check, AlertCircle, Loader } from "lucide-react";
 
 interface SettingsForm {
@@ -42,14 +42,7 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const token = getAdminToken();
-      if (!token) throw new Error("Not authenticated");
-
-      const response = await fetch("/api/admin/settings", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await adminFetch("/api/admin/settings");
 
       if (!response.ok) throw new Error("Failed to fetch settings");
 
@@ -74,14 +67,9 @@ export default function SettingsPage() {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      const token = getAdminToken();
-
-      const response = await fetch("/api/admin/settings", {
+      const response = await adminFetch("/api/admin/settings", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
 

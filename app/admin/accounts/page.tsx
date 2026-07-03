@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { getAdminToken } from "@/lib/admin-auth";
+import { adminFetch } from "@/lib/admin-auth";
 import {
   Search,
   ChevronLeft,
@@ -62,9 +62,6 @@ export default function AccountsPage() {
   const fetchAccounts = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = getAdminToken();
-      if (!token) throw new Error("Not authenticated");
-
       const params = new URLSearchParams({
         limit: pageSize.toString(),
         offset: (page * pageSize).toString(),
@@ -72,9 +69,7 @@ export default function AccountsPage() {
         ...(status && { status }),
       });
 
-      const response = await fetch(`/api/admin/accounts?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await adminFetch(`/api/admin/accounts?${params}`);
       if (!response.ok) throw new Error("Failed to fetch accounts");
 
       const data = await response.json();
@@ -100,13 +95,9 @@ export default function AccountsPage() {
       setActingId(id);
       setMessage("");
       setError("");
-      const token = getAdminToken();
-      const response = await fetch(`/api/admin/accounts/${id}`, {
+      const response = await adminFetch(`/api/admin/accounts/${id}`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = await response.json().catch(() => ({}));

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { getAdminToken } from "@/lib/admin-auth";
+import { adminFetch } from "@/lib/admin-auth";
 import { Search, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 import type { Order } from "@/types/index";
 
@@ -27,9 +27,6 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-      const token = getAdminToken();
-      if (!token) throw new Error("Not authenticated");
-
       const params = new URLSearchParams({
         limit: pageSize.toString(),
         offset: (page * pageSize).toString(),
@@ -37,11 +34,7 @@ export default function OrdersPage() {
         ...(status && { status }),
       });
 
-      const response = await fetch(`/api/admin/orders?${params}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await adminFetch(`/api/admin/orders?${params}`);
 
       if (!response.ok) throw new Error("Failed to fetch orders");
 

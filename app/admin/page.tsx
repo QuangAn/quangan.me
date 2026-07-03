@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getAdminToken } from "@/lib/admin-auth";
+import { adminFetch } from "@/lib/admin-auth";
 import {
   Users,
   ShoppingCart,
@@ -24,14 +24,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = getAdminToken();
-        if (!token) throw new Error("Not authenticated");
-
-        const response = await fetch("/api/admin/stats", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await adminFetch("/api/admin/stats");
 
         if (!response.ok) throw new Error("Failed to fetch stats");
 

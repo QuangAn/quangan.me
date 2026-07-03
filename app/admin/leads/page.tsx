@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { getAdminToken } from "@/lib/admin-auth";
+import { adminFetch } from "@/lib/admin-auth";
 import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import type { CourseLead } from "@/types/admin";
 
@@ -27,20 +27,13 @@ export default function LeadsPage() {
   const fetchLeads = async () => {
     try {
       setIsLoading(true);
-      const token = getAdminToken();
-      if (!token) throw new Error("Not authenticated");
-
       const params = new URLSearchParams({
         limit: pageSize.toString(),
         offset: (page * pageSize).toString(),
         ...(search && { search }),
       });
 
-      const response = await fetch(`/api/admin/leads?${params}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await adminFetch(`/api/admin/leads?${params}`);
 
       if (!response.ok) throw new Error("Failed to fetch leads");
 
@@ -60,16 +53,7 @@ export default function LeadsPage() {
   const exportToCSV = async () => {
     try {
       setIsExporting(true);
-      const token = getAdminToken();
-
-      const response = await fetch(
-        `/api/admin/leads?limit=999999&offset=0`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await adminFetch(`/api/admin/leads?limit=999999&offset=0`);
 
       if (!response.ok) throw new Error("Export failed");
 
