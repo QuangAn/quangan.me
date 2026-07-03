@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthorizedAdmin } from "@/lib/admin-api";
-import { listStudentAccounts } from "@/lib/students";
+import {
+  createStudentAccount,
+  listStudentAccounts,
+  studentAdminErrorMessage,
+  studentAdminErrorStatus,
+} from "@/lib/students";
 
 export const runtime = "nodejs";
 
@@ -30,4 +35,50 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({ data, total, limit, offset });
+}
+
+/** POST /api/admin/accounts — admin tạo thủ công một tài khoản học viên. */
+export async function POST(req: NextRequest) {
+  if (!isAuthorizedAdmin(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Dữ liệu gửi lên không hợp lệ." },
+      { status: 400 },
+    );
+  }
+
+  const {
+    email,
+    full_name,
+    phone,
+    plan_id,
+    send_email,
+  } = (body ?? {}) as Record<string, unknown>;
+
+  const result = await createStudentAccount({
+    email: typeof email === "string" ? email : "",
+    full_name: typeof full_name === "string" ? full_name : "",
+    phone: typeof phone === "string" ? phone : null,
+    plan_id: typeof plan_id === "string" ? plan_id : "",
+    sendEmail: send_email !== false,
+  });
+
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: studentAdminErrorMessage(result.error) },
+      { status: studentAdminErrorStatus(result.error) },
+    );
+  }
+
+  return NextResponse.json({
+    ok: true,
+    id: result.accountId,
+    emailStatus: result.emailStatus,
+  });
 }

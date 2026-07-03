@@ -7,6 +7,7 @@ import {
 import { sendEmail, type SendEmailResult } from "@/lib/email";
 import { buildUpgradeEmail, buildWelcomeEmail } from "@/lib/email/templates";
 import { getPlanRank } from "@/lib/course";
+import { getPlanById } from "@/config/pricing";
 import type {
   Order,
   StudentAccount,
@@ -376,7 +377,8 @@ export async function listStudentAccounts(
 
   let query = supabase
     .from("student_accounts")
-    .select(PUBLIC_COLUMNS, { count: "exact" })
+    // Kèm số đơn hàng đã cấp tài khoản (null nếu admin tạo tay).
+    .select(`${PUBLIC_COLUMNS}, orders(order_number)`, { count: "exact" })
     .order("created_at", { ascending: false })
     .range(params.offset, params.offset + params.limit - 1);
 
@@ -395,10 +397,16 @@ export async function listStudentAccounts(
     console.error("[students] Không đọc được danh sách:", error.message);
     return { data: [], total: 0 };
   }
-  return {
-    data: (data as unknown as StudentAccount[]) ?? [],
-    total: count ?? 0,
-  };
+
+  // Làm phẳng quan hệ orders → order_number cho gọn ở client.
+  const rows = ((data ?? []) as unknown as Array<
+    StudentAccount & { orders: { order_number: number } | null }
+  >).map(({ orders, ...rest }) => ({
+    ...rest,
+    order_number: orders?.order_number ?? null,
+  }));
+
+  return { data: rows, total: count ?? 0 };
 }
 
 /** Đặt lại mật khẩu (tạo mật khẩu tạm mới) và gửi lại email cho học viên. */
@@ -468,4 +476,202 @@ export async function countStudentAccounts(): Promise<number> {
     .from("student_accounts")
     .select("id", { count: "exact", head: true });
   return count ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// CRUD thủ công cho admin (thêm/sửa/xóa) — bổ trợ cho luồng tự cấp qua webhook.
+// ---------------------------------------------------------------------------
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Mã lỗi nghiệp vụ dùng chung cho các thao tác admin trên tài khoản. */
+export type StudentAdminError =
+  | "invalid-email"
+  | "missing-name"
+  | "invalid-plan"
+  | "email-exists"
+  | "not-found"
+  | "supabase-not-configured";
+
+/** Thông báo tiếng Việt tương ứng mã lỗi, hiển thị cho admin. */
+export function studentAdminErrorMessage(code?: string): string {
+  switch (code) {
+    case "invalid-email":
+      return "Email không hợp lệ.";
+    case "missing-name":
+      return "Vui lòng nhập họ và tên.";
+    case "invalid-plan":
+      return "Gói học không hợp lệ.";
+    case "email-exists":
+      return "Email này đã có tài khoản học viên.";
+    case "not-found":
+      return "Không tìm thấy tài khoản.";
+    case "supabase-not-configured":
+      return "Hệ thống chưa cấu hình cơ sở dữ liệu.";
+    default:
+      return "Thao tác thất bại. Vui lòng thử lại.";
+  }
+}
+
+/** Mã HTTP tương ứng mã lỗi nghiệp vụ. */
+export function studentAdminErrorStatus(code?: string): number {
+  switch (code) {
+    case "invalid-email":
+    case "missing-name":
+    case "invalid-plan":
+      return 400;
+    case "email-exists":
+      return 409;
+    case "not-found":
+      return 404;
+    default:
+      return 500;
+  }
+}
+
+export interface CreateStudentInput {
+  email: string;
+  full_name: string;
+  phone?: string | null;
+  plan_id: string;
+  /** Gửi email cấp mật khẩu tạm cho học viên (mặc định true). */
+  sendEmail?: boolean;
+}
+
+/**
+ * Admin tạo thủ công một tài khoản học viên (không gắn đơn hàng). Cấp mật khẩu
+ * tạm; nếu `sendEmail` khác false thì gửi email đăng nhập cho học viên.
+ */
+export async function createStudentAccount(
+  input: CreateStudentInput,
+): Promise<{
+  ok: boolean;
+  accountId?: string;
+  emailStatus?: WelcomeEmailStatus;
+  error?: string;
+}> {
+  const supabase = getSupabaseServiceClient();
+  if (!supabase) return { ok: false, error: "supabase-not-configured" };
+
+  const email = (input.email ?? "").trim().toLowerCase();
+  const fullName = (input.full_name ?? "").trim();
+  if (!EMAIL_REGEX.test(email)) return { ok: false, error: "invalid-email" };
+  if (!fullName) return { ok: false, error: "missing-name" };
+  const plan = getPlanById(input.plan_id);
+  if (!plan) return { ok: false, error: "invalid-plan" };
+
+  const tempPassword = generatePassword();
+  const passwordHash = await hashPassword(tempPassword);
+  const willSend = input.sendEmail !== false;
+
+  const { data: inserted, error: insertError } = await supabase
+    .from("student_accounts")
+    .insert({
+      order_id: null,
+      email,
+      full_name: fullName,
+      phone: input.phone?.trim() || null,
+      plan_id: plan.id,
+      plan_name: plan.name,
+      password_hash: passwordHash,
+      must_change_password: true,
+      status: "active",
+      welcome_email_status: willSend ? "pending" : "skipped",
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !inserted) {
+    if (insertError?.code === PG_UNIQUE_VIOLATION) {
+      return { ok: false, error: "email-exists" };
+    }
+    console.error("[students] Admin tạo tài khoản lỗi:", insertError?.message);
+    return { ok: false, error: insertError?.message ?? "insert-failed" };
+  }
+
+  const accountId = (inserted as { id: string }).id;
+  if (!willSend) {
+    // Chưa gửi email → admin có thể bấm "Đặt lại & gửi" để cấp mật khẩu sau.
+    return { ok: true, accountId, emailStatus: "skipped" };
+  }
+
+  const emailResult = await sendEmail({
+    to: email,
+    ...buildWelcomeEmail({
+      fullName,
+      email,
+      password: tempPassword,
+      planName: plan.name,
+    }),
+  });
+  const emailStatus = await recordEmailStatus(supabase, accountId, emailResult);
+  return { ok: true, accountId, emailStatus };
+}
+
+export interface UpdateStudentInput {
+  full_name?: string;
+  phone?: string | null;
+  email?: string;
+  plan_id?: string;
+}
+
+/**
+ * Admin sửa thông tin tài khoản (họ tên, SĐT, email, gói). Không đụng tới mật
+ * khẩu. Chỉ cập nhật các trường được truyền vào.
+ */
+export async function updateStudentAccount(
+  id: string,
+  input: UpdateStudentInput,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = getSupabaseServiceClient();
+  if (!supabase) return { ok: false, error: "supabase-not-configured" };
+
+  const update: Record<string, unknown> = {};
+  if (input.full_name !== undefined) {
+    const name = input.full_name.trim();
+    if (!name) return { ok: false, error: "missing-name" };
+    update.full_name = name;
+  }
+  if (input.phone !== undefined) {
+    update.phone = input.phone?.trim() || null;
+  }
+  if (input.email !== undefined) {
+    const email = input.email.trim().toLowerCase();
+    if (!EMAIL_REGEX.test(email)) return { ok: false, error: "invalid-email" };
+    update.email = email;
+  }
+  if (input.plan_id !== undefined) {
+    const plan = getPlanById(input.plan_id);
+    if (!plan) return { ok: false, error: "invalid-plan" };
+    update.plan_id = plan.id;
+    update.plan_name = plan.name;
+  }
+  if (Object.keys(update).length === 0) return { ok: true };
+
+  const { error } = await supabase
+    .from("student_accounts")
+    .update(update)
+    .eq("id", id);
+  if (error) {
+    if (error.code === PG_UNIQUE_VIOLATION) {
+      return { ok: false, error: "email-exists" };
+    }
+    return { ok: false, error: error.message };
+  }
+  return { ok: true };
+}
+
+/** Admin xóa vĩnh viễn một tài khoản học viên. */
+export async function deleteStudentAccount(
+  id: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = getSupabaseServiceClient();
+  if (!supabase) return { ok: false, error: "supabase-not-configured" };
+
+  const { error } = await supabase
+    .from("student_accounts")
+    .delete()
+    .eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }

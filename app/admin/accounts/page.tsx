@@ -17,7 +17,15 @@ import {
   MailWarning,
   MailX,
   Mail,
+  Plus,
+  Pencil,
+  Trash2,
 } from "lucide-react";
+import {
+  AccountFormModal,
+  ConfirmDialog,
+  type AccountFormValues,
+} from "@/components/admin/account-form-modal";
 import type { StudentAccount, WelcomeEmailStatus } from "@/types";
 
 const pageSize = 20;
@@ -58,6 +66,10 @@ export default function AccountsPage() {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const [actingId, setActingId] = useState<string | null>(null);
+  const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
+  const [editing, setEditing] = useState<StudentAccount | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<StudentAccount | null>(null);
+  const [lockTarget, setLockTarget] = useState<StudentAccount | null>(null);
 
   const fetchAccounts = useCallback(async () => {
     try {
@@ -119,6 +131,91 @@ export default function AccountsPage() {
     }
   };
 
+  /** Gửi form thêm/sửa. Trả về thông báo lỗi (string) hoặc null nếu thành công. */
+  const submitAccount = async (
+    values: AccountFormValues,
+  ): Promise<string | null> => {
+    setMessage("");
+    setError("");
+    const isEdit = formMode === "edit" && editing;
+    const url = isEdit
+      ? `/api/admin/accounts/${editing.id}`
+      : "/api/admin/accounts";
+    const method = isEdit ? "PATCH" : "POST";
+    const body = isEdit
+      ? {
+          full_name: values.full_name,
+          email: values.email,
+          phone: values.phone,
+          plan_id: values.plan_id,
+        }
+      : {
+          full_name: values.full_name,
+          email: values.email,
+          phone: values.phone,
+          plan_id: values.plan_id,
+          send_email: values.send_email,
+        };
+
+    try {
+      const response = await adminFetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) return data.error || "Thao tác thất bại.";
+
+      if (isEdit) {
+        setMessage("Đã cập nhật tài khoản.");
+      } else if (data.emailStatus === "sent") {
+        setMessage("Đã tạo tài khoản và gửi email đăng nhập cho học viên.");
+      } else if (data.emailStatus === "skipped") {
+        setMessage(
+          "Đã tạo tài khoản (chưa gửi email). Bấm “Đặt lại & gửi” để cấp mật khẩu cho học viên.",
+        );
+      } else {
+        setMessage(
+          "Đã tạo tài khoản, nhưng email chưa gửi được (kiểm tra cấu hình email).",
+        );
+      }
+      await fetchAccounts();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : "Không kết nối được máy chủ.";
+    }
+  };
+
+  const confirmLock = async () => {
+    if (!lockTarget) return;
+    const next = lockTarget.status === "active" ? "disabled" : "active";
+    await runAction(
+      lockTarget.id,
+      { action: "set_status", status: next },
+      next === "disabled" ? "Đã khóa tài khoản." : "Đã mở khóa tài khoản.",
+    );
+    setLockTarget(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setMessage("");
+    setError("");
+    try {
+      const response = await adminFetch(`/api/admin/accounts/${deleteTarget.id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Không xóa được.");
+      setMessage("Đã xóa tài khoản học viên.");
+      await fetchAccounts();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Không xóa được.");
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
   const formatDate = (date: string | null) =>
     date ? new Date(date).toLocaleString("vi-VN") : "—";
 
@@ -126,13 +223,25 @@ export default function AccountsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Tài khoản học viên
-        </h1>
-        <p className="text-slate-400">
-          {total} tài khoản • tự cấp khi thanh toán thành công
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Tài khoản học viên
+          </h1>
+          <p className="text-slate-400">
+            {total} tài khoản • tự cấp khi thanh toán thành công
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            setEditing(null);
+            setFormMode("create");
+          }}
+          className="bg-gradient-to-r from-indigo-600 to-cyan-600"
+        >
+          <Plus className="w-4 h-4" />
+          Thêm tài khoản
+        </Button>
       </div>
 
       {error && (
@@ -194,6 +303,9 @@ export default function AccountsPage() {
                   Gói
                 </th>
                 <th className="text-left py-4 px-6 text-sm font-medium text-slate-400">
+                  Nguồn
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-slate-400">
                   Email cấp TK
                 </th>
                 <th className="text-left py-4 px-6 text-sm font-medium text-slate-400">
@@ -210,7 +322,7 @@ export default function AccountsPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-slate-500">
                     Đang tải...
                   </td>
                 </tr>
@@ -235,6 +347,15 @@ export default function AccountsPage() {
                       </td>
                       <td className="py-4 px-6 text-sm text-slate-300">
                         {acc.plan_name ?? acc.plan_id}
+                      </td>
+                      <td className="py-4 px-6 text-sm">
+                        {acc.order_number ? (
+                          <span className="text-slate-300">
+                            Đơn #{acc.order_number}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-500">Tạo tay</span>
+                        )}
                       </td>
                       <td className="py-4 px-6 text-sm">
                         <span
@@ -284,21 +405,7 @@ export default function AccountsPage() {
                             variant="outline"
                             size="sm"
                             disabled={busy}
-                            onClick={() =>
-                              runAction(
-                                acc.id,
-                                {
-                                  action: "set_status",
-                                  status:
-                                    acc.status === "active"
-                                      ? "disabled"
-                                      : "active",
-                                },
-                                acc.status === "active"
-                                  ? "Đã khóa tài khoản."
-                                  : "Đã mở khóa tài khoản.",
-                              )
-                            }
+                            onClick={() => setLockTarget(acc)}
                             title={
                               acc.status === "active"
                                 ? "Khóa tài khoản"
@@ -311,6 +418,28 @@ export default function AccountsPage() {
                               <Unlock className="w-4 h-4" />
                             )}
                           </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={busy}
+                            onClick={() => {
+                              setEditing(acc);
+                              setFormMode("edit");
+                            }}
+                            title="Sửa thông tin"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={busy}
+                            onClick={() => setDeleteTarget(acc)}
+                            title="Xóa tài khoản"
+                            className="text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -318,7 +447,7 @@ export default function AccountsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-slate-500">
                     Chưa có tài khoản học viên nào
                   </td>
                 </tr>
@@ -360,9 +489,75 @@ export default function AccountsPage() {
           chuyển sang <span className="text-green-400">đã thanh toán</span>, kèm
           email gửi thông tin đăng nhập. Nếu cột &quot;Email cấp TK&quot; báo
           lỗi/chưa gửi, hãy cấu hình email (RESEND_API_KEY) rồi bấm
-          &quot;Đặt lại &amp; gửi&quot; để gửi lại cho học viên.
+          &quot;Đặt lại &amp; gửi&quot; để gửi lại cho học viên. Bạn cũng có thể
+          bấm <span className="text-white">&quot;Thêm tài khoản&quot;</span> để
+          tạo thủ công.
         </p>
       </Card>
+
+      {formMode && (
+        <AccountFormModal
+          mode={formMode}
+          account={editing}
+          onSubmit={submitAccount}
+          onClose={() => {
+            setFormMode(null);
+            setEditing(null);
+          }}
+        />
+      )}
+
+      {lockTarget && (
+        <ConfirmDialog
+          title={
+            lockTarget.status === "active"
+              ? "Khóa tài khoản học viên"
+              : "Mở khóa tài khoản học viên"
+          }
+          message={
+            lockTarget.status === "active" ? (
+              <>
+                Khóa tài khoản{" "}
+                <span className="font-semibold text-white">
+                  {lockTarget.email}
+                </span>
+                ? Học viên sẽ không đăng nhập được cho tới khi mở lại.
+              </>
+            ) : (
+              <>
+                Mở khóa tài khoản{" "}
+                <span className="font-semibold text-white">
+                  {lockTarget.email}
+                </span>
+                ? Học viên sẽ đăng nhập lại được.
+              </>
+            )
+          }
+          confirmLabel={lockTarget.status === "active" ? "Khóa" : "Mở khóa"}
+          confirmClassName="bg-gradient-to-r from-indigo-600 to-cyan-600 text-white"
+          onConfirm={confirmLock}
+          onClose={() => setLockTarget(null)}
+        />
+      )}
+
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Xóa tài khoản học viên"
+          message={
+            <>
+              Xóa vĩnh viễn tài khoản{" "}
+              <span className="font-semibold text-white">
+                {deleteTarget.email}
+              </span>
+              ? Học viên sẽ không đăng nhập được nữa. Hành động này không thể hoàn
+              tác.
+            </>
+          }
+          confirmLabel="Xóa"
+          onConfirm={confirmDelete}
+          onClose={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 }

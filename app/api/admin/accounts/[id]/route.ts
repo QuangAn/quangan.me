@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthorizedAdmin } from "@/lib/admin-api";
 import {
+  deleteStudentAccount,
   resetStudentPasswordAndEmail,
   setStudentStatus,
+  studentAdminErrorMessage,
+  studentAdminErrorStatus,
+  updateStudentAccount,
 } from "@/lib/students";
 
 export const runtime = "nodejs";
@@ -66,4 +70,68 @@ export async function POST(
   }
 
   return NextResponse.json({ error: "Hành động không hợp lệ." }, { status: 400 });
+}
+
+/** PATCH /api/admin/accounts/[id] — sửa thông tin tài khoản học viên. */
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!isAuthorizedAdmin(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Dữ liệu gửi lên không hợp lệ." },
+      { status: 400 },
+    );
+  }
+
+  const { full_name, phone, email, plan_id } = (body ?? {}) as Record<
+    string,
+    unknown
+  >;
+
+  const result = await updateStudentAccount(id, {
+    ...(typeof full_name === "string" ? { full_name } : {}),
+    ...(typeof phone === "string" ? { phone } : {}),
+    ...(typeof email === "string" ? { email } : {}),
+    ...(typeof plan_id === "string" ? { plan_id } : {}),
+  });
+
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: studentAdminErrorMessage(result.error) },
+      { status: studentAdminErrorStatus(result.error) },
+    );
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+/** DELETE /api/admin/accounts/[id] — xóa vĩnh viễn tài khoản học viên. */
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!isAuthorizedAdmin(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const result = await deleteStudentAccount(id);
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: "Không xóa được tài khoản." },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({ ok: true });
 }

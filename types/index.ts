@@ -211,6 +211,8 @@ export interface StudentAccount {
   welcome_email_sent_at: string | null;
   last_login_at: string | null;
   created_at: string;
+  /** Số đơn hàng đã cấp tài khoản (null = admin tạo tay). Chỉ có ở list admin. */
+  order_number?: number | null;
 }
 
 /** Thông tin học viên rút gọn lưu trong session (an toàn để dùng ở portal). */
