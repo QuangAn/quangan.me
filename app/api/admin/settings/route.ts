@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthorizedAdmin } from "@/lib/admin-api";
+import { getBankInfo } from "@/lib/payment";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -51,11 +52,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       ...settings,
       webhookUrl,
-      bankDetails: {
-        bankCode: process.env.BANK_CODE || "",
-        accountNumber: process.env.BANK_ACCOUNT_NUMBER || "",
-        accountName: process.env.BANK_ACCOUNT_NAME || "",
-      },
+      // Cùng nguồn với mã QR trên trang thanh toán (SEPAY_* / config/payment.ts)
+      // để admin không hiển thị lệch với số tài khoản khách thực sự quét.
+      bankDetails: getBankInfo(),
     });
   } catch (error) {
     console.error("Error fetching settings:", error);

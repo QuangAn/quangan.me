@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createHmac, timingSafeEqual } from "crypto";
 import {
   extractTransferCode,
   getOrderByCode,
@@ -10,6 +11,59 @@ import { provisionStudentForOrder } from "@/lib/students";
 
 export const runtime = "nodejs";
 
+// Cửa sổ chấp nhận lệch thời gian (chống replay) — theo khuyến nghị SePay: ±5 phút.
+const TIMESTAMP_TOLERANCE_SECONDS = 300;
+
+/** So sánh chuỗi constant-time (tránh dò qua thời gian phản hồi). */
+function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) {
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
+
+/**
+ * Xác thực HMAC-SHA256 theo chuẩn SePay:
+ *   - Header  X-SePay-Signature: sha256=<hex>
+ *   - Header  X-SePay-Timestamp: <unix giây>
+ *   - Ký      HMAC_SHA256(secret, "{timestamp}.{raw_body}") -> hex
+ * Secret dùng nguyên văn (kể cả tiền tố whsec_).
+ */
+function verifyHmacSignature(
+  request: Request,
+  rawBody: string,
+  secret: string,
+): boolean {
+  const signature = request.headers.get("x-sepay-signature");
+  const timestampHeader = request.headers.get("x-sepay-timestamp");
+  if (!signature || !timestampHeader) return false;
+
+  const timestamp = Number(timestampHeader);
+  if (!Number.isFinite(timestamp)) return false;
+
+  // Chống replay: từ chối nếu timestamp lệch quá cửa sổ cho phép.
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (Math.abs(nowSeconds - timestamp) > TIMESTAMP_TOLERANCE_SECONDS) {
+    return false;
+  }
+
+  const expected =
+    "sha256=" +
+    createHmac("sha256", secret)
+      .update(`${timestamp}.${rawBody}`)
+      .digest("hex");
+
+  return safeEqual(expected, signature);
+}
+
+/** Xác thực API Key: header Authorization: Apikey <key>. */
+function verifyApiKey(request: Request, apiKey: string): boolean {
+  return request.headers.get("authorization") === `Apikey ${apiKey}`;
+}
+
 /**
  * POST /api/sepay/webhook — SePay gọi khi tài khoản ngân hàng có giao dịch.
  *
@@ -19,27 +73,38 @@ export const runtime = "nodejs";
  * retry vô ích — giao dịch đã được ghi log để đối soát thủ công.
  */
 export async function POST(request: Request) {
+  const secret = process.env.SEPAY_WEBHOOK_SECRET;
   const apiKey = process.env.SEPAY_WEBHOOK_API_KEY;
-  if (!apiKey) {
-    // Chưa cấu hình key → từ chối mọi webhook thay vì nhận mù
-    console.error("[sepay] Thiếu SEPAY_WEBHOOK_API_KEY — từ chối webhook.");
+
+  // Chưa cấu hình phương thức xác thực nào → từ chối thay vì nhận mù.
+  if (!secret && !apiKey) {
+    console.error(
+      "[sepay] Thiếu SEPAY_WEBHOOK_SECRET / SEPAY_WEBHOOK_API_KEY — từ chối webhook.",
+    );
     return NextResponse.json(
       { success: false, message: "Webhook chưa được cấu hình" },
       { status: 500 },
     );
   }
 
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Apikey ${apiKey}`) {
+  // Đọc RAW body để tính HMAC — KHÔNG dùng request.json() rồi stringify lại
+  // (re-serialize sẽ làm lệch chữ ký).
+  const rawBody = await request.text();
+
+  const authorized = Boolean(
+    (secret && verifyHmacSignature(request, rawBody, secret)) ||
+      (apiKey && verifyApiKey(request, apiKey)),
+  );
+  if (!authorized) {
     return NextResponse.json(
-      { success: false, message: "Sai API key" },
+      { success: false, message: "Xác thực webhook thất bại" },
       { status: 401 },
     );
   }
 
   let payload: SepayWebhookPayload;
   try {
-    payload = (await request.json()) as SepayWebhookPayload;
+    payload = JSON.parse(rawBody) as SepayWebhookPayload;
   } catch {
     return NextResponse.json(
       { success: false, message: "Payload không hợp lệ" },
