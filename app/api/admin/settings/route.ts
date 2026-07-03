@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { isAuthorizedAdmin } from "@/lib/admin-api";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -17,15 +18,9 @@ async function initializeSettingsTable() {
   // This is a placeholder for future use
 }
 
-function validateAdminAuth(req: NextRequest): boolean {
-  const authHeader = req.headers.get("authorization");
-  const token = authHeader?.replace("Bearer ", "");
-  return token === process.env.ADMIN_SECRET_KEY;
-}
-
 export async function GET(req: NextRequest) {
   try {
-    if (!validateAdminAuth(req)) {
+    if (!isAuthorizedAdmin(req)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -73,7 +68,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!validateAdminAuth(req)) {
+    if (!isAuthorizedAdmin(req)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

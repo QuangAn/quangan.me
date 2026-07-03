@@ -19,15 +19,23 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      // In production, this should be a backend call
-      // For now, we'll use a client-side validation with env variable
-      const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+      // Kiểm mật khẩu phía server; nhận về token session đã ký (không lộ secret).
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        token?: string;
+        error?: string;
+      };
 
-      if (password === adminPassword) {
-        setAdminToken(password);
+      if (res.ok && data.ok && data.token) {
+        setAdminToken(data.token);
         router.push("/admin");
       } else {
-        setError("Mật khẩu không chính xác");
+        setError(data.error || "Mật khẩu không chính xác");
       }
     } catch (error) {
       setError("Đã xảy ra lỗi. Vui lòng thử lại.");

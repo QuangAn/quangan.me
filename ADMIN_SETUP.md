@@ -17,8 +17,9 @@ Trang quản lý admin để theo dõi đăng ký, đơn hàng, và cài đặt 
 Thêm các biến sau vào `.env.local`:
 
 ```bash
-# Admin Panel
-NEXT_PUBLIC_ADMIN_PASSWORD=your_secure_password
+# Admin Panel (đăng nhập kiểm phía server — KHÔNG dùng NEXT_PUBLIC)
+ADMIN_PASSWORD=your_secure_password
+ADMIN_SESSION_SECRET=random_secret   # tuỳ chọn, mặc định dùng ADMIN_SECRET_KEY
 ADMIN_SECRET_KEY=your_secure_admin_key
 
 # Thông tin ngân hàng (hiển thị cho khách)
@@ -83,22 +84,23 @@ Truy cập: `https://yourdomain.com/admin`
 
 ### Đăng nhập Admin
 
-1. Nhập mật khẩu `NEXT_PUBLIC_ADMIN_PASSWORD` trên trang `/admin/login`
-2. Token được lưu trong `localStorage` với tên `admin_token`
-3. Mỗi request API gửi token trong header `Authorization: Bearer {token}`
+1. Nhập mật khẩu trên `/admin/login` → gửi lên `POST /api/admin/login`.
+2. Server so mật khẩu với `ADMIN_PASSWORD` (constant-time), trả về **token session ký HMAC** (hết hạn 7 ngày). Mật khẩu/secret KHÔNG bao giờ ra client.
+3. Token lưu ở `localStorage` (`admin_token`), gửi kèm mỗi request qua `Authorization: Bearer {token}`.
 
 ### Bảo vệ API Routes
 
-Tất cả API routes (`/api/admin/*`) đều kiểm tra token:
+Tất cả `/api/admin/*` xác thực qua `isAuthorizedAdmin(req)` (`lib/admin-api.ts`):
 
 ```typescript
-const authHeader = req.headers.get("authorization");
-const token = authHeader?.replace("Bearer ", "");
+import { isAuthorizedAdmin } from "@/lib/admin-api";
 
-if (token !== process.env.ADMIN_SECRET_KEY) {
+if (!isAuthorizedAdmin(req)) {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 ```
+
+`isAuthorizedAdmin` chấp nhận: (1) token session admin đã ký (UI), hoặc (2) `ADMIN_SECRET_KEY` thô cho tooling/CLI. Không còn phụ thuộc biến `NEXT_PUBLIC_*`, nên `ADMIN_SECRET_KEY` không bị nhúng vào bundle client.
 
 ### Khuyến nghị
 
