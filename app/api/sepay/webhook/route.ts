@@ -6,6 +6,7 @@ import {
   markOrderPaid,
   type SepayWebhookPayload,
 } from "@/lib/orders";
+import { provisionStudentForOrder } from "@/lib/students";
 
 export const runtime = "nodejs";
 
@@ -82,6 +83,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true });
   }
 
-  await markOrderPaid(order.id, payload);
+  const marked = await markOrderPaid(order.id, payload);
+
+  // Chỉ cấp tài khoản khi lần này chính là lần chuyển pending → paid
+  // (markOrderPaid idempotent, chỉ trả true ở lần đầu). Lỗi cấp tài khoản
+  // KHÔNG được làm SePay retry — đơn đã ghi nhận thanh toán, chủ khóa học
+  // gửi lại email từ trang admin nếu cần.
+  if (marked) {
+    try {
+      const result = await provisionStudentForOrder(order);
+      if (!result.ok) {
+        console.error(
+          `[sepay] Cấp tài khoản thất bại cho đơn ${order.transfer_code}: ${result.error}`,
+        );
+      }
+    } catch (error) {
+      console.error(
+        `[sepay] Lỗi cấp tài khoản cho đơn ${order.transfer_code}:`,
+        error,
+      );
+    }
+  }
+
   return NextResponse.json({ success: true });
 }

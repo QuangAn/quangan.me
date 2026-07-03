@@ -45,7 +45,7 @@ export const paymentPageContent = {
     "Đã chuyển khoản nhưng chưa được xác nhận sau 5 phút? Nhắn Zalo kèm ảnh chụp giao dịch, chúng tôi xử lý ngay.",
   successTitle: "Thanh toán thành công!",
   successMessage:
-    "Cảm ơn bạn đã đăng ký. Chúng tôi sẽ liên hệ qua Zalo/email trong hôm nay để bàn giao tài khoản học và hướng dẫn bắt đầu.",
+    "Tài khoản học của bạn đã được tạo tự động. Vui lòng kiểm tra email (cả mục Spam/Quảng cáo) để nhận thông tin đăng nhập, rồi vào khu vực học để bắt đầu.",
   expiredTitle: "Đơn hàng đã hết hạn thanh toán",
   expiredMessage:
     "Đừng lo — bạn chỉ cần đăng ký lại, hoặc nhắn Zalo để chúng tôi hỗ trợ mở lại đơn này.",

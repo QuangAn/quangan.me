@@ -31,6 +31,11 @@ export async function GET(req: NextRequest) {
       .from("course_leads")
       .select("*", { count: "exact", head: true });
 
+    // Total student accounts (tài khoản học viên đã cấp)
+    const { count: totalStudents } = await supabase
+      .from("student_accounts")
+      .select("id", { count: "exact", head: true });
+
     // Total orders and stats
     const { data: orderStats, count: totalOrders } = await supabase
       .from("orders")
@@ -71,6 +76,7 @@ export async function GET(req: NextRequest) {
       totalRevenue,
       pendingOrders: pendingOrders.length,
       paidOrders: paidOrders.length,
+      totalStudents: totalStudents || 0,
       recentLeads: recentLeads || [],
       recentOrders: recentOrders || [],
     });

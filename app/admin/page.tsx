@@ -12,6 +12,7 @@ import {
   Clock,
   PhoneIcon,
   MailIcon,
+  GraduationCap,
 } from "lucide-react";
 import type { DashboardStats, CourseLead } from "@/types/admin";
 
@@ -94,7 +95,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-500/30 p-6">
           <div className="flex items-start justify-between">
             <div>
@@ -140,6 +141,30 @@ export default function AdminDashboard() {
               </p>
             </div>
             <Clock className="w-8 h-8 text-orange-400 opacity-50" />
+          </div>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 border-cyan-500/30 p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-slate-400 text-sm mb-1">Đã thanh toán</p>
+              <p className="text-3xl font-bold text-white">
+                {stats?.paidOrders || 0}
+              </p>
+            </div>
+            <ShoppingCart className="w-8 h-8 text-cyan-400 opacity-50" />
+          </div>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 border-indigo-500/30 p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-slate-400 text-sm mb-1">Học viên đã cấp</p>
+              <p className="text-3xl font-bold text-white">
+                {stats?.totalStudents || 0}
+              </p>
+            </div>
+            <GraduationCap className="w-8 h-8 text-indigo-400 opacity-50" />
           </div>
         </Card>
       </div>

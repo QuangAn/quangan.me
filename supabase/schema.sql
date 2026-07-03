@@ -110,3 +110,45 @@ create table if not exists public.admin_settings (
 
 alter table public.admin_settings enable row level security;
 -- Không tạo policy public — chỉ authenticated admin được truy cập.
+
+-- ============================================================
+-- Tài khoản học viên — tự cấp khi thanh toán thành công
+-- ============================================================
+
+-- Mỗi đơn đã thanh toán tạo (hoặc nâng cấp) một tài khoản học viên. Đăng nhập
+-- bằng email + mật khẩu; chỉ đọc/ghi qua service role ở server (KHÔNG policy public).
+-- Chỉ lưu HASH mật khẩu (scrypt), không bao giờ lưu mật khẩu gốc.
+create table if not exists public.student_accounts (
+  id uuid primary key default gen_random_uuid(),
+  -- Đơn hàng đã kích hoạt tài khoản (unique để webhook retry không tạo trùng)
+  order_id uuid unique references public.orders (id),
+  email text not null,
+  full_name text not null,
+  phone text,
+  plan_id text not null,
+  plan_name text,
+  -- Định dạng: scrypt$N$r$p$saltB64$hashB64
+  password_hash text not null,
+  -- true khi vẫn dùng mật khẩu tạm hệ thống cấp (khuyến khích đổi)
+  must_change_password boolean not null default true,
+  status text not null default 'active' check (status in ('active', 'disabled')),
+  -- Trạng thái gửi email cấp tài khoản để đối soát khi email lỗi
+  welcome_email_status text not null default 'pending'
+    check (welcome_email_status in ('pending', 'sent', 'failed', 'skipped')),
+  welcome_email_error text,
+  welcome_email_sent_at timestamptz,
+  last_login_at timestamptz,
+  -- Mốc đổi/đặt lại mật khẩu — session cấp trước mốc này bị vô hiệu hóa.
+  password_changed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+alter table public.student_accounts enable row level security;
+-- Không tạo policy public — mọi truy cập đi qua service role ở server.
+
+-- Email là định danh đăng nhập → duy nhất, không phân biệt hoa thường.
+create unique index if not exists student_accounts_email_key
+on public.student_accounts (lower(email));
+
+create index if not exists student_accounts_created_at_idx
+on public.student_accounts (created_at desc);

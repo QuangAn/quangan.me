@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  GraduationCap,
 } from "lucide-react";
 import { clearAdminToken, getAdminToken } from "@/lib/admin-auth";
 
@@ -58,6 +59,7 @@ export default function AdminLayout({
     { href: "/admin", icon: BarChart3, label: "Dashboard" },
     { href: "/admin/leads", icon: Users, label: "Đăng ký" },
     { href: "/admin/orders", icon: ShoppingCart, label: "Đơn hàng" },
+    { href: "/admin/accounts", icon: GraduationCap, label: "Tài khoản HV" },
     { href: "/admin/settings", icon: Settings, label: "Cài đặt" },
   ];
 

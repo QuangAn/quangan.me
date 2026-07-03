@@ -27,6 +27,7 @@ export interface DashboardStats {
   totalRevenue: number;
   pendingOrders: number;
   paidOrders: number;
+  totalStudents: number;
   recentLeads: CourseLead[];
   recentOrders: Array<{
     id: string;

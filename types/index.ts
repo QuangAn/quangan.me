@@ -188,3 +188,60 @@ export interface BankInfo {
   accountNumber: string;
   accountName: string;
 }
+
+/** Trạng thái gửi email cấp tài khoản học viên. */
+export type WelcomeEmailStatus = "pending" | "sent" | "failed" | "skipped";
+
+/** Trạng thái tài khoản học viên. */
+export type StudentAccountStatus = "active" | "disabled";
+
+/** Tài khoản học viên — ánh xạ bảng `student_accounts` trên Supabase. */
+export interface StudentAccount {
+  id: string;
+  order_id: string | null;
+  email: string;
+  full_name: string;
+  phone: string | null;
+  plan_id: PlanId;
+  plan_name: string | null;
+  must_change_password: boolean;
+  status: StudentAccountStatus;
+  welcome_email_status: WelcomeEmailStatus;
+  welcome_email_error: string | null;
+  welcome_email_sent_at: string | null;
+  last_login_at: string | null;
+  created_at: string;
+}
+
+/** Thông tin học viên rút gọn lưu trong session (an toàn để dùng ở portal). */
+export interface StudentSessionUser {
+  id: string;
+  email: string;
+  full_name: string;
+  plan_id: PlanId;
+  plan_name: string | null;
+  must_change_password: boolean;
+}
+
+/** Loại tài nguyên của một bài học trong portal. */
+export type LessonType = "video" | "doc" | "download" | "link";
+
+/** Một bài học/tài liệu trong khu vực học. */
+export interface CourseLesson {
+  title: string;
+  type?: LessonType;
+  duration?: string;
+  /** Link tài liệu (Google Drive, YouTube, PDF...). Bỏ trống = "sắp cập nhật". */
+  resourceUrl?: string;
+}
+
+/** Một chương/module trong khu vực học, có thể giới hạn theo gói. */
+export interface CourseSection {
+  order: number;
+  icon: IconName;
+  title: string;
+  summary: string;
+  /** Gói tối thiểu để xem chương này. Bỏ trống = mọi gói đều xem được. */
+  minPlan?: PlanId;
+  lessons: CourseLesson[];
+}

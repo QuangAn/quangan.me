@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Clock,
+  GraduationCap,
   Landmark,
   MessageCircle,
   QrCode,
@@ -322,13 +323,16 @@ function SuccessPanel({
 
       <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
         <Button asChild variant="gradient" size="lg">
-          <a href={zaloHref} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="h-4 w-4" aria-hidden />
-            Nhắn Zalo nhận tài khoản học
-          </a>
+          <Link href="/hoc/dang-nhap">
+            <GraduationCap className="h-4 w-4" aria-hidden />
+            Vào học ngay
+          </Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link href="/">Về trang chủ</Link>
+          <a href={zaloHref} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="h-4 w-4" aria-hidden />
+            Chưa nhận được email? Nhắn Zalo
+          </a>
         </Button>
       </div>
     </div>
