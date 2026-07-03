@@ -9,8 +9,6 @@ export const module02: CourseDocModule = {
   tagline: "Bộ hồ sơ dự án + prompt mẫu",
   description:
     "Học cách giao việc cho AI: tạo bộ hồ sơ dự án (document) trước, để AI hiểu đúng và code đúng ngay từ đầu.",
-  duration: "60–75 phút",
-  level: "Dễ hiểu",
   outcome: "Có bộ document đầu tiên và biết quy trình giao việc cho AI",
   lessons: [
     {

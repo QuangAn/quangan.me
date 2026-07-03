@@ -9,8 +9,6 @@ export const module07: CourseDocModule = {
   tagline: "Lưu dữ liệu thật + trang quản trị",
   description:
     "Kết nối website với Supabase để lưu khách hàng, đơn hàng, lịch hẹn thật; tạo trang đăng nhập, dashboard quản trị và CRM chăm sóc khách hàng.",
-  duration: "180–240 phút",
-  level: "Nâng cao (vẫn không cần biết code)",
   outcome: "Website lưu dữ liệu thật, có dashboard quản trị và CRM khách hàng",
   lessons: [
     {

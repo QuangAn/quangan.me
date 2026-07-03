@@ -9,8 +9,6 @@ export const module03: CourseDocModule = {
   tagline: "Thực hành trọn quy trình",
   description:
     "Dùng lại đúng quy trình ở Module 2: có ý tưởng, tạo đủ bộ document cho AI, để AI đọc tài liệu, lập kế hoạch rồi mới bắt đầu code landing page.",
-  duration: "90–120 phút",
-  level: "Dễ",
   outcome: "Có landing page chạy được trên máy của bạn",
   lessons: [
     {

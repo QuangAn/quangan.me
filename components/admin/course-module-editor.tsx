@@ -32,8 +32,6 @@ interface DraftModule {
   shortTitle: string;
   tagline: string;
   description: string;
-  duration: string;
-  level: string;
   outcome: string;
   lessons: DraftLesson[];
 }
@@ -57,8 +55,6 @@ function toDraft(module: CourseDocModule): DraftModule {
     shortTitle: module.shortTitle,
     tagline: module.tagline,
     description: module.description,
-    duration: module.duration,
-    level: module.level,
     outcome: module.outcome,
     lessons: module.lessons.map(toDraftLesson),
   };
@@ -192,8 +188,6 @@ export function CourseModuleEditor({
           shortTitle: draft.shortTitle,
           tagline: draft.tagline,
           description: draft.description,
-          duration: draft.duration,
-          level: draft.level,
           outcome: draft.outcome,
           lessons: payload.lessons,
         }),
@@ -243,22 +237,6 @@ export function CourseModuleEditor({
             <Input
               value={draft.tagline}
               onChange={(e) => setField("tagline", e.target.value)}
-              className="border-slate-700 bg-slate-900/50 text-white"
-            />
-          </Field>
-          <Field label="Thời lượng">
-            <Input
-              value={draft.duration}
-              onChange={(e) => setField("duration", e.target.value)}
-              placeholder="45–60 phút"
-              className="border-slate-700 bg-slate-900/50 text-white"
-            />
-          </Field>
-          <Field label="Độ khó">
-            <Input
-              value={draft.level}
-              onChange={(e) => setField("level", e.target.value)}
-              placeholder="Dễ"
               className="border-slate-700 bg-slate-900/50 text-white"
             />
           </Field>

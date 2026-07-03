@@ -45,8 +45,6 @@ export async function PATCH(
     ...(b.description !== undefined
       ? { description: asString(b.description) }
       : {}),
-    ...(b.duration !== undefined ? { duration: asString(b.duration) } : {}),
-    ...(b.level !== undefined ? { level: asString(b.level) } : {}),
     ...(b.outcome !== undefined ? { outcome: asString(b.outcome) } : {}),
     ...(b.lessons !== undefined ? { lessons: normalizeLessons(b.lessons) } : {}),
   });

@@ -9,8 +9,6 @@ export const module01: CourseDocModule = {
   tagline: "Cài công cụ, từng bước một",
   description:
     "Không cần biết code. Mục tiêu của module này là cài đủ công cụ để AI có thể làm website ngay trên máy của bạn.",
-  duration: "45–60 phút",
-  level: "Dễ",
   outcome: "Máy tính đã sẵn sàng để AI làm website",
   lessons: [
     {

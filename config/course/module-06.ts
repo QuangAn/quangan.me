@@ -9,8 +9,6 @@ export const module06: CourseDocModule = {
   tagline: "Chọn dịch vụ → ngày giờ → xác nhận",
   description:
     "Làm website booking cho spa, salon, phòng khám, dịch vụ tư vấn: khách chọn dịch vụ, chọn ngày giờ và gửi thông tin đặt lịch.",
-  duration: "120–150 phút",
-  level: "Trung bình",
   outcome: "Có website đặt lịch với luồng chọn dịch vụ, ngày giờ hoàn chỉnh",
   lessons: [
     {

@@ -9,8 +9,6 @@ export const module04: CourseDocModule = {
   tagline: "Nhiều trang + menu điều hướng",
   description:
     "Nâng cấp từ landing page 1 trang lên website nhiều trang: Trang chủ, Giới thiệu, Dịch vụ, Liên hệ — có menu điều hướng và bố cục chuyên nghiệp.",
-  duration: "120–150 phút",
-  level: "Trung bình",
   outcome: "Có website doanh nghiệp nhiều trang chạy được, kèm form liên hệ",
   lessons: [
     {

@@ -9,8 +9,6 @@ export const module05: CourseDocModule = {
   tagline: "Danh mục + chi tiết + đặt hàng",
   description:
     "Làm website bán hàng có danh mục sản phẩm, trang chi tiết từng sản phẩm và form đặt hàng — khách xem hàng và đặt mua ngay trên website của bạn.",
-  duration: "150–180 phút",
-  level: "Trung bình",
   outcome: "Có website bán hàng với danh mục, chi tiết sản phẩm và form đặt hàng",
   lessons: [
     {
