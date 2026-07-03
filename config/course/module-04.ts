@@ -9,8 +9,6 @@ export const module04: CourseDocModule = {
   tagline: "Nhiều trang + menu điều hướng",
   description:
     "Nâng cấp từ landing page 1 trang lên website nhiều trang: Trang chủ, Giới thiệu, Dịch vụ, Liên hệ — có menu điều hướng và bố cục chuyên nghiệp.",
-  duration: "120–150 phút",
-  level: "Trung bình",
   outcome: "Có website doanh nghiệp nhiều trang chạy được, kèm form liên hệ",
   lessons: [
     {
@@ -170,7 +168,7 @@ Business Brief:
         {
           type: "prompt",
           title: "Prompt đọc document và lập kế hoạch",
-          prompt: `Hãy đọc toàn bộ document trong project (PROJECT.md, PRD.md, UI_UX_SPEC.md, DATABASE.md, TASKS.md, CLAUDE.md).
+          prompt: `Hãy đọc các document trong project (PROJECT.md, PRD.md, UI_UX_SPEC.md, DATABASE.md, TASKS.md). CLAUDE.md thì Claude Code tự đọc mỗi phiên, không cần liệt kê.
 
 Sau đó:
 1. Tóm tắt lại bạn hiểu dự án như thế nào

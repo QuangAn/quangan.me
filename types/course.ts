@@ -85,8 +85,6 @@ export interface CourseDocModule {
   tagline: string;
   /** Mô tả module hiển thị ở phần đầu. */
   description: string;
-  duration: string;
-  level: string;
   /** Kết quả học viên đạt được sau module. */
   outcome: string;
   lessons: CourseLesson[];

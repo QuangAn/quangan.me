@@ -178,8 +178,6 @@ create table if not exists public.course_modules (
   short_title text not null default '',
   tagline text not null default '',
   description text not null default '',
-  duration text not null default '',
-  level text not null default '',
   outcome text not null default '',
   -- Mảng bài học: [{ id, title, description, duration, videoLabel?, videoUrl?, main[], aside[] }]
   lessons jsonb not null default '[]'::jsonb,
@@ -189,6 +187,11 @@ create table if not exists public.course_modules (
 
 alter table public.course_modules enable row level security;
 -- Không tạo policy public — mọi truy cập đi qua service role ở server.
+
+-- Bỏ cột thời lượng/độ khó ở cấp module (không còn hiển thị ở portal học).
+-- Idempotent: DB mới tạo ở trên đã không có cột này nên đây là no-op; DB cũ sẽ được dọn.
+alter table public.course_modules drop column if exists duration;
+alter table public.course_modules drop column if exists level;
 
 create index if not exists course_modules_sort_order_idx
 on public.course_modules (sort_order);

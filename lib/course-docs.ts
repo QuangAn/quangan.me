@@ -23,14 +23,12 @@ interface CourseModuleRow {
   short_title: string;
   tagline: string;
   description: string;
-  duration: string;
-  level: string;
   outcome: string;
   lessons: CourseLesson[];
 }
 
 const SELECT_COLUMNS =
-  "id, sort_order, title, short_title, tagline, description, duration, level, outcome, lessons";
+  "id, sort_order, title, short_title, tagline, description, outcome, lessons";
 
 /** Các trường một module có thể ghi (admin gửi lên khi tạo/sửa). */
 export interface CourseModuleInput {
@@ -38,8 +36,6 @@ export interface CourseModuleInput {
   shortTitle?: string;
   tagline?: string;
   description?: string;
-  duration?: string;
-  level?: string;
   outcome?: string;
   sortOrder?: number;
   lessons?: CourseLesson[];
@@ -54,8 +50,6 @@ function rowToModule(row: CourseModuleRow): CourseDocModule {
     shortTitle: row.short_title,
     tagline: row.tagline,
     description: row.description,
-    duration: row.duration,
-    level: row.level,
     outcome: row.outcome,
     // Chuẩn hóa ở biên đọc: dù dữ liệu vào DB bằng đường nào cũng an toàn render.
     lessons: normalizeLessons(row.lessons),
@@ -71,8 +65,6 @@ function moduleToRow(m: CourseDocModule): Record<string, unknown> {
     short_title: m.shortTitle,
     tagline: m.tagline,
     description: m.description,
-    duration: m.duration,
-    level: m.level,
     outcome: m.outcome,
     lessons: m.lessons,
   };
@@ -152,8 +144,6 @@ function inputToRow(input: CourseModuleInput): Record<string, unknown> {
   if (input.shortTitle !== undefined) row.short_title = input.shortTitle.trim();
   if (input.tagline !== undefined) row.tagline = input.tagline;
   if (input.description !== undefined) row.description = input.description;
-  if (input.duration !== undefined) row.duration = input.duration;
-  if (input.level !== undefined) row.level = input.level;
   if (input.outcome !== undefined) row.outcome = input.outcome;
   if (input.sortOrder !== undefined) row.sort_order = input.sortOrder;
   if (input.lessons !== undefined) row.lessons = input.lessons;
@@ -192,8 +182,6 @@ export async function createCourseModule(
       shortTitle: (input.shortTitle ?? "").trim() || title,
       tagline: input.tagline ?? "",
       description: input.description ?? "",
-      duration: input.duration ?? "",
-      level: input.level ?? "",
       outcome: input.outcome ?? "",
       lessons: input.lessons ?? [],
     }),

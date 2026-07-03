@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+<<<<<<< HEAD
 import {
   ArrowLeft,
   Check,
@@ -13,6 +14,9 @@ import {
   PlayCircle,
   Target,
 } from "lucide-react";
+=======
+import { ArrowLeft, ChevronDown, MessageCircle, PlayCircle, Target } from "lucide-react";
+>>>>>>> e7d51c0f0b0ad2a93f1966b058fa90b47148e10a
 import { LessonBlockView } from "@/components/course/lesson-blocks";
 import { lessonKey, useCourseProgress } from "@/components/course/use-course-progress";
 import { cn } from "@/lib/utils";
@@ -278,8 +282,6 @@ function ModuleContent({
           {module.description}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <MetaPill icon={<Clock className="h-3.5 w-3.5" aria-hidden />} text={`Thời gian: ${module.duration}`} />
-          <MetaPill icon={<Gauge className="h-3.5 w-3.5" aria-hidden />} text={`Độ khó: ${module.level}`} />
           <MetaPill icon={<Target className="h-3.5 w-3.5" aria-hidden />} text={`Kết quả: ${module.outcome}`} />
         </div>
 

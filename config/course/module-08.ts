@@ -9,8 +9,6 @@ export const module08: CourseDocModule = {
   tagline: "GitHub → Vercel → tên miền → khách hàng",
   description:
     "Đưa website lên Internet với tên miền riêng bằng GitHub + Vercel, biết cách cập nhật website sau khi đã chạy, và bắt đầu nhận dự án làm website để kiếm thêm thu nhập.",
-  duration: "120–150 phút",
-  level: "Trung bình",
   outcome: "Website chạy trên Internet với tên miền riêng + lộ trình nhận dự án đầu tiên",
   lessons: [
     {

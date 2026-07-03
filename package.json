@@ -10,6 +10,7 @@
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,css}\"",
     "db:push": "node scripts/run-sql.mjs",
+    "course:sync": "node scripts/sync-course-module.mjs",
     "deploy": "node scripts/deploy.mjs"
   },
   "dependencies": {

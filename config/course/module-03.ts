@@ -9,8 +9,6 @@ export const module03: CourseDocModule = {
   tagline: "Thực hành trọn quy trình",
   description:
     "Dùng lại đúng quy trình ở Module 2: có ý tưởng, tạo đủ bộ document cho AI, để AI đọc tài liệu, lập kế hoạch rồi mới bắt đầu code landing page.",
-  duration: "90–120 phút",
-  level: "Dễ",
   outcome: "Có landing page chạy được trên máy của bạn",
   lessons: [
     {
@@ -296,14 +294,15 @@ Landing Brief:
         {
           type: "prompt",
           title: "Prompt bắt AI đọc document",
-          prompt: `Hãy đọc toàn bộ các file document trong project:
+          prompt: `Hãy đọc các file document trong project:
 
 - PROJECT.md
 - PRD.md
 - UI_UX_SPEC.md
 - DATABASE.md
 - TASKS.md
-- CLAUDE.md
+
+(CLAUDE.md thì Claude Code tự đọc mỗi phiên, không cần liệt kê.)
 
 Sau đó hãy làm 3 việc:
 1. Tóm tắt lại bạn hiểu dự án này như thế nào
@@ -607,7 +606,7 @@ Tôi vừa làm thao tác này trước khi lỗi xảy ra:
 
 Hãy phân tích nguyên nhân, chỉ rõ file cần sửa và sửa theo cách an toàn nhất.
 Yêu cầu:
-- Đọc lại PROJECT.md, PRD.md, UI_UX_SPEC.md, DATABASE.md, TASKS.md, CLAUDE.md trước khi sửa
+- Chỉ tập trung vào đúng file gây lỗi, không đọc lại toàn bộ document
 - Không thay đổi những phần không liên quan
 - Sau khi sửa xong, hướng dẫn tôi cách kiểm tra lại`,
         },
