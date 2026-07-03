@@ -47,7 +47,9 @@ Cần 2 biến trong .env.local:
 → Hoặc chạy thủ công: copy nội dung supabase/schema.sql vào
   Supabase Dashboard → SQL Editor → Run.
 `);
-  process.exit(1);
+  // Exit 2 = "thiếu cấu hình" (khác exit 1 = SQL chạy lỗi) để deploy.mjs
+  // phân biệt: thiếu token thì bỏ qua SQL, còn lỗi SQL thật thì dừng.
+  process.exit(2);
 }
 
 const sqlDir = join(root, "supabase");

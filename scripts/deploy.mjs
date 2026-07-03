@@ -58,7 +58,22 @@ if (skipSql) {
   console.log("• Bỏ qua bước SQL (--no-sql).");
 } else {
   console.log("① Chạy SQL lên Supabase…");
-  run("node", [join(root, "scripts", "run-sql.mjs")]);
+  const sql = spawnSync("node", [join(root, "scripts", "run-sql.mjs")], {
+    cwd: root,
+    stdio: "inherit",
+    shell: false,
+  });
+  if (sql.status === 2) {
+    // Thiếu cấu hình (SUPABASE_ACCESS_TOKEN) → không chặn deploy code.
+    console.log(
+      "\n⚠ Bỏ qua SQL: chưa cấu hình SUPABASE_ACCESS_TOKEN — vẫn tiếp tục deploy code.\n" +
+        "  (Thêm token vào .env.local để tự chạy SQL, hoặc dùng --no-sql để ẩn cảnh báo này.)"
+    );
+  } else if (sql.status !== 0) {
+    // SQL thật sự chạy lỗi → dừng, KHÔNG deploy.
+    console.error("\n✖ SQL chạy lỗi — dừng lại, không commit/deploy.");
+    process.exit(sql.status || 1);
+  }
 }
 
 // ── Bước 2: Commit thay đổi ─────────────────────────────────────────────────
