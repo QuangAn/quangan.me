@@ -28,12 +28,20 @@ export async function GET(req: NextRequest) {
     const envFallback = getBankInfo();
     const envWebhookUrl = process.env.SEPAY_WEBHOOK_URL || "";
 
+    // URL endpoint nhận webhook của chính site này (để admin copy dán vào SePay).
+    // Ưu tiên domain cấu hình cố định, fallback về origin của request hiện tại.
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
+      req.nextUrl.origin;
+    const webhookReceiveUrl = `${siteUrl}/api/sepay/webhook`;
+
     return NextResponse.json({
       sepay_api_key: data?.sepay_api_key || "",
       sepay_webhook_url: data?.sepay_webhook_url || envWebhookUrl,
       bank_code: data?.bank_code || envFallback.bankCode,
       bank_account_number: data?.bank_account_number || envFallback.accountNumber,
       bank_account_name: data?.bank_account_name || envFallback.accountName,
+      webhookReceiveUrl,
     });
   } catch (error) {
     console.error("Error fetching settings:", error);

@@ -10,7 +10,7 @@ Thêm vào `.env.local`:
 
 ```bash
 # Admin credentials
-NEXT_PUBLIC_ADMIN_PASSWORD=your_secure_password_here
+ADMIN_PASSWORD=your_secure_password_here
 ADMIN_SECRET_KEY=your_secure_admin_key_here
 
 # Bank account (hiển thị cho khách)
@@ -48,7 +48,7 @@ npm run dev
 # Truy cập: http://localhost:3000/admin/login
 ```
 
-Đăng nhập bằng mật khẩu từ `NEXT_PUBLIC_ADMIN_PASSWORD`.
+Đăng nhập bằng mật khẩu từ `ADMIN_PASSWORD`.
 
 ## 📊 Các Trang Admin
 
@@ -112,7 +112,7 @@ components/ui/
 
 ## 📝 Notes
 
-- Admin password là `NEXT_PUBLIC_ADMIN_PASSWORD` (công khai trong URL, nhưng để dùng trên form)
+- Admin password là `ADMIN_PASSWORD` (kiểm PHÍA SERVER tại `/api/admin/login`, KHÔNG bao giờ gửi ra client)
 - API secret key là `ADMIN_SECRET_KEY` (bí mật, chỉ server biết)
 - Dữ liệu được load real-time (không cache)
 - CSV export lấy tất cả leads (không giới hạn)

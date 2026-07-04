@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { adminFetch } from "@/lib/admin-auth";
-import { Copy, Check, AlertCircle, Loader } from "lucide-react";
+import { Copy, Check, Loader } from "lucide-react";
 
 interface SettingsForm {
   sepay_api_key: string;
@@ -22,12 +22,6 @@ export default function SettingsPage() {
     bank_account_number: "",
     bank_account_name: "",
     bank_code: "",
-  });
-
-  const [bankDetails, setBankDetails] = useState({
-    accountNumber: "",
-    accountName: "",
-    bankCode: "",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -54,8 +48,7 @@ export default function SettingsPage() {
         bank_account_name: data.bank_account_name || "",
         bank_code: data.bank_code || "",
       });
-      setBankDetails(data.bankDetails || {});
-      setWebhookUrl(data.webhookUrl || "");
+      setWebhookUrl(data.webhookReceiveUrl || "");
     } catch (error) {
       setMessage("Không thể tải cài đặt");
       console.error(error);
@@ -148,98 +141,73 @@ export default function SettingsPage() {
 
       {/* Bank Details Section */}
       <Card className="border-slate-700 bg-slate-800/50 p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Thông tin tài khoản ngân hàng</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Thông tin tài khoản ngân hàng
+        </h2>
         <p className="text-slate-400 text-sm mb-4">
-          Những thông tin này được hiển thị công khai cho khách để chuyển tiền.
-          Được load từ environment variables.
+          Hiển thị công khai cho khách chuyển tiền và dùng để sinh mã QR VietQR.
+          Lưu vào cơ sở dữ liệu — sửa ở đây rồi bấm “Lưu cài đặt”, không cần
+          deploy lại. Bỏ trống trường nào sẽ tự lấy từ biến môi trường{" "}
+          <code className="rounded bg-slate-900/50 px-1 text-cyan-300">
+            SEPAY_BANK_*
+          </code>
+          .
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm text-slate-400 mb-2 block">
+            <label className="text-sm font-medium text-white mb-2 block">
               Mã ngân hàng
             </label>
-            <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-700 rounded p-2">
-              <code className="flex-1 text-sm text-white font-mono">
-                {bankDetails.bankCode || "-"}
-              </code>
-              {bankDetails.bankCode && (
-                <button
-                  onClick={() =>
-                    copyToClipboard(bankDetails.bankCode, "bankCode")
-                  }
-                  className="text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  {copiedField === "bankCode" ? (
-                    <Check className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <Copy className="w-5 h-5" />
-                  )}
-                </button>
-              )}
-            </div>
+            <Input
+              type="text"
+              value={settings.bank_code}
+              onChange={(e) =>
+                setSettings({ ...settings, bank_code: e.target.value })
+              }
+              placeholder="ACB"
+              className="bg-slate-900/50 border-slate-700"
+            />
           </div>
 
           <div>
-            <label className="text-sm text-slate-400 mb-2 block">
+            <label className="text-sm font-medium text-white mb-2 block">
               Số tài khoản
             </label>
-            <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-700 rounded p-2">
-              <code className="flex-1 text-sm text-white font-mono">
-                {bankDetails.accountNumber || "-"}
-              </code>
-              {bankDetails.accountNumber && (
-                <button
-                  onClick={() =>
-                    copyToClipboard(bankDetails.accountNumber, "accountNumber")
-                  }
-                  className="text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  {copiedField === "accountNumber" ? (
-                    <Check className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <Copy className="w-5 h-5" />
-                  )}
-                </button>
-              )}
-            </div>
+            <Input
+              type="text"
+              value={settings.bank_account_number}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  bank_account_number: e.target.value,
+                })
+              }
+              placeholder="1234567890"
+              className="bg-slate-900/50 border-slate-700"
+            />
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-sm text-slate-400 mb-2 block">
+            <label className="text-sm font-medium text-white mb-2 block">
               Tên chủ tài khoản
             </label>
-            <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-700 rounded p-2">
-              <code className="flex-1 text-sm text-white font-mono">
-                {bankDetails.accountName || "-"}
-              </code>
-              {bankDetails.accountName && (
-                <button
-                  onClick={() =>
-                    copyToClipboard(bankDetails.accountName, "accountName")
-                  }
-                  className="text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  {copiedField === "accountName" ? (
-                    <Check className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <Copy className="w-5 h-5" />
-                  )}
-                </button>
-              )}
-            </div>
+            <Input
+              type="text"
+              value={settings.bank_account_name}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  bank_account_name: e.target.value,
+                })
+              }
+              placeholder="NGUYEN VAN A"
+              className="bg-slate-900/50 border-slate-700"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              Viết IN HOA, KHÔNG DẤU đúng như tên trên tài khoản ngân hàng.
+            </p>
           </div>
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded flex gap-3 text-sm text-blue-300">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <p>
-            Để thay đổi thông tin tài khoản, vui lòng cập nhật trong file
-            <code className="bg-slate-900/50 px-2 py-1 rounded mx-1 text-cyan-300">
-              .env.local
-            </code>
-            rồi deploy lại.
-          </p>
         </div>
       </Card>
 
@@ -307,34 +275,16 @@ export default function SettingsPage() {
       {/* Info Box */}
       <Card className="border-slate-700 bg-slate-800/50 p-6 text-sm text-slate-300 space-y-3">
         <p>
-          <strong>Lưu ý:</strong> Tất cả thông tin nhạy cảm (API key, webhook
-          URL) nên được bảo vệ bằng HTTPS trong production.
+          <strong>Lưu ý:</strong> Thông tin ngân hàng và SePay được lưu trong cơ
+          sở dữ liệu (bảng{" "}
+          <code className="rounded bg-slate-900/50 px-2 py-1 text-cyan-300">
+            admin_settings
+          </code>
+          ); trường nào để trống sẽ tự lấy từ biến môi trường tương ứng.
         </p>
         <p>
-          Để quản lý thông tin ngân hàng, vui lòng cập nhật biến môi trường:
+          Trong production, hãy đảm bảo API key và webhook URL luôn đi qua HTTPS.
         </p>
-        <ul className="list-disc list-inside space-y-1 text-slate-400">
-          <li>
-            <code className="bg-slate-900/50 px-2 py-1 rounded text-cyan-300">
-              BANK_CODE
-            </code>
-          </li>
-          <li>
-            <code className="bg-slate-900/50 px-2 py-1 rounded text-cyan-300">
-              BANK_ACCOUNT_NUMBER
-            </code>
-          </li>
-          <li>
-            <code className="bg-slate-900/50 px-2 py-1 rounded text-cyan-300">
-              BANK_ACCOUNT_NAME
-            </code>
-          </li>
-          <li>
-            <code className="bg-slate-900/50 px-2 py-1 rounded text-cyan-300">
-              SEPAY_WEBHOOK_URL
-            </code>
-          </li>
-        </ul>
       </Card>
     </div>
   );

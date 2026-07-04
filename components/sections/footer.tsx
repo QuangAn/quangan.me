@@ -34,6 +34,14 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  href="/hoc"
+                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                >
+                  Khu vực học viên
+                </a>
+              </li>
             </ul>
           </div>
 
