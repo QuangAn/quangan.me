@@ -3,8 +3,7 @@
 // proxy nguyên prefix — trang, /api, /_next/* đều nằm dưới path này.
 // Đổi domain → đặt env CAFE_AROMA_ORIGIN trên Vercel, không cần sửa code.
 const CAFE_AROMA_ORIGIN =
-  process.env.CAFE_AROMA_ORIGIN ||
-  "https://cafe-aroma-quangan-3724s-projects.vercel.app";
+  process.env.CAFE_AROMA_ORIGIN || "https://cafe-aroma-silk.vercel.app";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
