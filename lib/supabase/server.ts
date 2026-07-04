@@ -16,9 +16,19 @@ export function getSupabaseServiceClient(): SupabaseClient | null {
   }
 
   if (!serviceClient) {
-    serviceClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    try {
+      serviceClient = createClient(supabaseUrl, serviceRoleKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+    } catch (err) {
+      // URL/khóa sai định dạng khiến createClient ném đồng bộ. Trả null (coi như
+      // chưa cấu hình) thay vì để lỗi lan ra và làm sập trang gọi tới.
+      console.error(
+        "[supabase] Không tạo được service client (kiểm tra NEXT_PUBLIC_SUPABASE_URL):",
+        err instanceof Error ? err.message : err,
+      );
+      return null;
+    }
   }
 
   return serviceClient;

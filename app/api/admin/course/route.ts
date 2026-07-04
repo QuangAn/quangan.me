@@ -4,6 +4,7 @@ import {
   createCourseModule,
   listCourseModulesForAdmin,
 } from "@/lib/course-docs";
+import { courseModules as configModules } from "@/config/course";
 
 export const runtime = "nodejs";
 
@@ -14,13 +15,16 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { data, persisted } = await listCourseModulesForAdmin();
-    return NextResponse.json({ data, persisted });
+    const { data, persisted, reason } = await listCourseModulesForAdmin();
+    return NextResponse.json({ data, persisted, reason });
   } catch (err) {
+    // listCourseModulesForAdmin đã tự fallback về config nên nhánh này gần như
+    // không xảy ra; nếu vẫn lỗi ngoài dự kiến, trả nội dung config (đúng bằng
+    // những gì học viên xem ở /hoc) để banner "db-error" không nói sai sự thật.
     console.error("[admin/course] GET lỗi:", err);
     return NextResponse.json(
-      { error: "Không tải được tài liệu." },
-      { status: 500 },
+      { data: configModules, persisted: false, reason: "db-error" },
+      { status: 200 },
     );
   }
 }

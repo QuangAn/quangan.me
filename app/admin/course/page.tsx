@@ -10,9 +10,12 @@ import { ConfirmDialog } from "@/components/admin/account-form-modal";
 import { CourseModuleEditor } from "@/components/admin/course-module-editor";
 import type { CourseDocModule } from "@/types/course";
 
+type AdminCourseReason = "not-configured" | "db-error";
+
 export default function AdminCoursePage() {
   const [modules, setModules] = useState<CourseDocModule[]>([]);
   const [persisted, setPersisted] = useState(true);
+  const [reason, setReason] = useState<AdminCourseReason | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -27,6 +30,7 @@ export default function AdminCoursePage() {
       const list: CourseDocModule[] = data.data ?? [];
       setModules(list);
       setPersisted(data.persisted !== false);
+      setReason(data.persisted === false ? (data.reason ?? "db-error") : null);
       setActiveId((current) => {
         if (selectId && list.some((m) => m.id === selectId)) return selectId;
         if (current && list.some((m) => m.id === current)) return current;
@@ -113,8 +117,23 @@ export default function AdminCoursePage() {
 
       {!persisted && (
         <div className="rounded border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-300">
-          Chưa cấu hình cơ sở dữ liệu (Supabase). Bạn đang xem nội dung mặc định —
-          các thay đổi sẽ không lưu được cho tới khi cấu hình xong.
+          {reason === "db-error" ? (
+            <>
+              Đang hiển thị nội dung mặc định (giống hệt học viên xem tại /hoc) vì
+              chưa đọc được cơ sở dữ liệu tài liệu. Thường do bảng{" "}
+              <code className="rounded bg-amber-500/15 px-1">course_modules</code>{" "}
+              chưa được tạo. Hãy deploy (push lên nhánh <code>main</code>) để chạy
+              migration tạo bảng, hoặc chạy thủ công{" "}
+              <code className="rounded bg-amber-500/15 px-1">supabase/schema.sql</code>{" "}
+              trong Supabase → SQL Editor. Sau khi bảng có, tải lại trang là chỉnh
+              sửa lưu được.
+            </>
+          ) : (
+            <>
+              Chưa cấu hình cơ sở dữ liệu (Supabase). Bạn đang xem nội dung mặc
+              định — các thay đổi sẽ không lưu được cho tới khi cấu hình xong.
+            </>
+          )}
         </div>
       )}
 

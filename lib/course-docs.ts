@@ -70,27 +70,37 @@ function moduleToRow(m: CourseDocModule): Record<string, unknown> {
   };
 }
 
-/**
- * Danh sách module tài liệu cho học viên (/hoc). Đọc từ DB; nếu DB chưa cấu
- * hình, lỗi, hoặc còn trống → trả về nội dung config để học viên luôn có tài
- * liệu xem.
- */
-export async function listCourseModules(): Promise<CourseDocModule[]> {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) return configModules;
-
+/** Đọc toàn bộ module từ DB (đã sắp theo sort_order). Ném lỗi nếu DB lỗi. */
+async function fetchModulesFromDb(
+  supabase: SupabaseClient,
+): Promise<CourseDocModule[]> {
   const { data, error } = await supabase
     .from("course_modules")
     .select(SELECT_COLUMNS)
     .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  const rows = (data ?? []) as unknown as CourseModuleRow[];
+  return rows.map(rowToModule);
+}
 
-  if (error) {
-    console.error("[course-docs] Không đọc được tài liệu:", error.message);
+/**
+ * Danh sách module tài liệu cho học viên (/hoc). Đọc từ DB; nếu DB chưa cấu
+ * hình, lỗi (vd chưa tạo bảng), hoặc còn trống → trả về nội dung config để học
+ * viên luôn có tài liệu xem.
+ */
+export async function listCourseModules(): Promise<CourseDocModule[]> {
+  try {
+    const supabase = getSupabaseServiceClient();
+    if (!supabase) return configModules;
+    const modules = await fetchModulesFromDb(supabase);
+    return modules.length > 0 ? modules : configModules;
+  } catch (err) {
+    console.error(
+      "[course-docs] Không đọc được tài liệu:",
+      err instanceof Error ? err.message : err,
+    );
     return configModules;
   }
-  const rows = (data ?? []) as unknown as CourseModuleRow[];
-  if (rows.length === 0) return configModules;
-  return rows.map(rowToModule);
 }
 
 /**
@@ -114,27 +124,38 @@ async function seedIfEmpty(supabase: SupabaseClient): Promise<void> {
   if (insertError) throw new Error(insertError.message);
 }
 
+/** Lý do admin đang xem nội dung mặc định (không lưu được chỉnh sửa). */
+export type AdminCourseReason = "not-configured" | "db-error";
+
 /**
  * Danh sách module cho admin: seed từ config nếu bảng trống rồi trả về bản DB
- * (để admin sửa được). Nếu chưa cấu hình Supabase → trả về config (chỉ xem).
+ * (để admin sửa được).
+ *
+ * Không bao giờ ném lỗi ra ngoài: nếu chưa cấu hình Supabase hoặc DB lỗi (vd
+ * chưa chạy migration tạo bảng course_modules) → fallback về nội dung config —
+ * đúng bằng những gì học viên thấy ở /hoc — kèm cờ persisted=false để UI báo
+ * rằng chỉnh sửa chưa lưu được cho tới khi tạo bảng.
  */
 export async function listCourseModulesForAdmin(): Promise<{
   data: CourseDocModule[];
   persisted: boolean;
+  reason?: AdminCourseReason;
 }> {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) return { data: configModules, persisted: false };
-
-  await seedIfEmpty(supabase);
-
-  const { data, error } = await supabase
-    .from("course_modules")
-    .select(SELECT_COLUMNS)
-    .order("sort_order", { ascending: true });
-  if (error) throw new Error(error.message);
-
-  const rows = (data ?? []) as unknown as CourseModuleRow[];
-  return { data: rows.map(rowToModule), persisted: true };
+  try {
+    const supabase = getSupabaseServiceClient();
+    if (!supabase) {
+      return { data: configModules, persisted: false, reason: "not-configured" };
+    }
+    await seedIfEmpty(supabase);
+    const modules = await fetchModulesFromDb(supabase);
+    return { data: modules, persisted: true };
+  } catch (err) {
+    console.error(
+      "[course-docs] Admin đọc DB lỗi, tạm hiển thị nội dung mặc định:",
+      err instanceof Error ? err.message : err,
+    );
+    return { data: configModules, persisted: false, reason: "db-error" };
+  }
 }
 
 /** Chỉ giữ các trường được truyền vào, map camelCase → cột DB. */
