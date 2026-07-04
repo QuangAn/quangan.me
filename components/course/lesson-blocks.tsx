@@ -3,6 +3,21 @@ import { CopyButton } from "@/components/course/copy-button";
 import { cn } from "@/lib/utils";
 import type { LessonBlock } from "@/types/course";
 
+/** Một mục "tránh → nên": có ❌ (việc nên tránh) đứng trước ✅ (việc nên làm). */
+const DODONT_RE = /❌.*✅/u;
+
+/** Tách mục do/don't thành vế "tránh" (trái) và vế "nên" (phải). */
+function splitDoDont(item: string) {
+  const at = item.indexOf("✅");
+  const right = at >= 0 ? item.slice(at + 1).trim() : "";
+  const left = (at >= 0 ? item.slice(0, at) : item)
+    // bỏ ❌ đầu dòng và mũi tên nối ngay trước ✅ (giữ nguyên mũi tên trong phần giải thích)
+    .replace(/^\s*❌\s*/u, "")
+    .replace(/\s*(→|➜|=>|->)\s*$/u, "")
+    .trim();
+  return { left, right };
+}
+
 /** Màu sắc theo tone của khối ghi chú. */
 const noteTones = {
   info: "border-primary/50 bg-primary/10 text-foreground",
@@ -13,16 +28,48 @@ const noteTones = {
 /** Render một khối nội dung bài học theo type. */
 export function LessonBlockView({ block }: { block: LessonBlock }) {
   switch (block.type) {
-    case "card":
+    case "card": {
+      const list = block.list ?? [];
+      // Danh sách "❌ tránh → ✅ nên" → bảng do/don't gọn gàng, bỏ chấm bullet thừa.
+      const isDoDont =
+        !block.ordered && list.length > 0 && list.every((i) => DODONT_RE.test(i));
       return (
-        <div className="rounded-2xl border border-white/10 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-white/[0.06] bg-secondary/30 p-5">
           <h4 className="text-sm font-bold">{block.title}</h4>
           {block.body?.map((paragraph) => (
             <p key={paragraph} className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {paragraph}
             </p>
           ))}
-          {block.list ? (
+          {isDoDont ? (
+            <ul className="mt-3 divide-y divide-white/[0.06] overflow-hidden rounded-xl border border-white/[0.06]">
+              {list.map((item) => {
+                const { left, right } = splitDoDont(item);
+                return (
+                  <li key={item} className="px-3.5 py-2.5 text-sm leading-relaxed">
+                    <p className="flex items-start gap-2 text-rose-300">
+                      <span aria-hidden className="mt-px shrink-0 font-bold">
+                        ✕
+                      </span>
+                      <span>
+                        <span className="sr-only">Tránh: </span>
+                        {left}
+                      </span>
+                    </p>
+                    <p className="mt-1 flex items-start gap-2 text-emerald-300">
+                      <span aria-hidden className="mt-px shrink-0 font-bold">
+                        ✓
+                      </span>
+                      <span>
+                        <span className="sr-only">Nên: </span>
+                        {right}
+                      </span>
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : block.list ? (
             block.ordered ? (
               <ol className="mt-3 space-y-2">
                 {block.list.map((item, index) => (
@@ -47,15 +94,16 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
           ) : null}
         </div>
       );
+    }
 
     case "prompt":
       return (
-        <div className="rounded-2xl border border-primary/25 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-primary/20 bg-secondary/30 p-5">
           <h4 className="text-sm font-bold">{block.title}</h4>
           {block.intro ? (
             <p className="mt-2 text-sm text-muted-foreground">{block.intro}</p>
           ) : null}
-          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-background/80 p-4 text-[13px] leading-relaxed text-foreground/90">
+          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-white/[0.06] bg-background/70 p-4 text-[13px] leading-relaxed text-foreground/90">
             {block.prompt}
           </pre>
           <div className="mt-3">
@@ -66,9 +114,9 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
 
     case "code":
       return (
-        <div className="rounded-2xl border border-white/10 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-white/[0.06] bg-secondary/30 p-5">
           {block.title ? <h4 className="text-sm font-bold">{block.title}</h4> : null}
-          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-accent/20 bg-background/80 p-4 font-mono text-[13px] leading-relaxed text-accent-strong">
+          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-accent/15 bg-background/70 p-4 font-mono text-[13px] leading-relaxed text-accent-strong">
             {block.code}
           </pre>
           <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -95,7 +143,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
           {(block.items ?? []).map((item) => (
             <details
               key={item.question}
-              className="group rounded-xl border border-white/10 bg-secondary/40 px-4 py-3"
+              className="group rounded-xl border border-white/[0.06] bg-secondary/30 px-4 py-3"
             >
               <summary className="cursor-pointer list-none text-sm font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                 <span className="mr-1.5 inline-block text-accent transition-transform group-open:rotate-90">
@@ -113,15 +161,23 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
 
     case "files":
       return (
-        <div className="rounded-2xl border border-white/10 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-white/[0.06] bg-secondary/30 p-5">
           {block.title ? <h4 className="mb-3 text-sm font-bold">{block.title}</h4> : null}
-          <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-2.5 sm:grid-cols-2">
             {(block.items ?? []).map((file) => (
-              <div key={file.name} className="rounded-xl border border-white/10 bg-background/60 p-3">
-                <p className="text-sm font-bold">
-                  <span aria-hidden>{file.emoji}</span> {file.name}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">{file.description}</p>
+              <div
+                key={file.name}
+                className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-background/50 p-3.5"
+              >
+                <span className="mt-0.5 shrink-0 text-lg leading-none" aria-hidden>
+                  {file.emoji}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold">{file.name}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    {file.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

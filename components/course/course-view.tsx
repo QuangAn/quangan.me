@@ -10,7 +10,6 @@ import {
   ChevronDown,
   MessageCircle,
   PlayCircle,
-  Sparkles,
   Target,
   Trophy,
 } from "lucide-react";
@@ -132,8 +131,9 @@ export function CourseView({
   const body = (
     <div
       className={cn(
-        "grid items-start gap-8 lg:grid-cols-[300px_1fr]",
-        showChrome && "container pb-20 pt-8",
+        "grid items-start gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:gap-12",
+        showChrome &&
+          "mx-auto w-full max-w-[1400px] px-4 pb-20 pt-8 sm:px-6 lg:px-8",
       )}
     >
       <ModuleSidebar
@@ -144,39 +144,37 @@ export function CourseView({
       />
 
       <main className="min-w-0">
-        <section className="premium-dark relative overflow-hidden rounded-3xl border border-white/10 px-6 py-8 text-white sm:px-8">
+        <section className="premium-dark relative overflow-hidden rounded-3xl border border-white/10 px-6 py-6 text-white sm:px-8 sm:py-7">
           <div className="noise absolute inset-0" aria-hidden />
-          <div className="relative">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold">
-              <Sparkles className="h-3.5 w-3.5 text-accent-strong" aria-hidden />
-              {courseContent.badge}
-            </span>
-            <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl">
-              Xin chào, {studentName} 👋
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
-              {courseContent.heroDescription}
-            </p>
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0 flex-1 lg:max-w-xl">
+              <h1 className="text-xl font-extrabold sm:text-2xl">
+                Xin chào, {studentName} 👋
+              </h1>
+              <p className="mt-1.5 text-sm leading-relaxed text-white/70">
+                {courseContent.heroDescription}
+              </p>
 
-            <div className="mt-6 max-w-md">
-              <div className="flex items-center justify-between text-xs font-semibold text-white/80">
-                <span>Tiến độ học của bạn</span>
-                <span className="tabular-nums">
-                  {doneLessons}/{totalLessons} bài · {overallPercent}%
-                </span>
-              </div>
-              <div
-                role="progressbar"
-                aria-valuenow={overallPercent}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label="Tiến độ toàn khóa học"
-                className="mt-2 h-2 overflow-hidden rounded-full bg-white/15"
-              >
+              <div className="mt-5">
+                <div className="flex items-center justify-between text-xs font-semibold text-white/70">
+                  <span>Tiến độ toàn khóa</span>
+                  <span className="tabular-nums text-white">
+                    {doneLessons}/{totalLessons} bài · {overallPercent}%
+                  </span>
+                </div>
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-[width] duration-500 ease-out"
-                  style={{ width: `${overallPercent}%` }}
-                />
+                  role="progressbar"
+                  aria-valuenow={overallPercent}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Tiến độ toàn khóa học"
+                  className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/15"
+                >
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-[width] duration-500 ease-out"
+                    style={{ width: `${overallPercent}%` }}
+                  />
+                </div>
               </div>
             </div>
 
@@ -184,9 +182,9 @@ export function CourseView({
               <button
                 type="button"
                 onClick={() => openLesson(nextUp.moduleId, nextUp.lessonId)}
-                className="group mt-5 flex w-full max-w-md items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] px-4 py-3 text-left transition hover:border-white/30 hover:bg-white/[0.12]"
+                className="group flex w-full shrink-0 items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] px-4 py-3.5 text-left transition hover:border-white/30 hover:bg-white/[0.12] lg:w-80"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
                   <PlayCircle className="h-5 w-5" aria-hidden />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -203,7 +201,7 @@ export function CourseView({
                 />
               </button>
             ) : (
-              <div className="mt-5 flex max-w-md items-center gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-emerald-100">
+              <div className="flex w-full shrink-0 items-center gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3.5 text-emerald-100 lg:w-80">
                 <Trophy className="h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
                 <p className="text-sm font-bold">
                   Bạn đã hoàn thành toàn bộ khóa học. Xuất sắc! 🎉
@@ -272,7 +270,7 @@ export function CourseView({
   );
 }
 
-/** Sidebar chọn module: dọc trên desktop, cuộn ngang trên mobile. */
+/** Sidebar chọn module: list dọc tối giản trên desktop, cuộn ngang trên mobile. */
 function ModuleSidebar({
   modules,
   activeModuleId,
@@ -286,12 +284,12 @@ function ModuleSidebar({
 }) {
   return (
     <aside className="min-w-0 lg:sticky lg:top-24">
-      <p className="mb-3 text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
-        {modules.length} Module
+      <p className="mb-3 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">
+        Nội dung khóa học
       </p>
       <nav
         aria-label="Danh sách module"
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {modules.map((module, index) => {
           const active = module.id === activeModuleId;
@@ -304,56 +302,47 @@ function ModuleSidebar({
               onClick={() => onSelect(module.id)}
               aria-current={active ? "true" : undefined}
               className={cn(
-                "w-56 shrink-0 rounded-2xl border px-4 py-3 text-left transition lg:w-full",
+                "flex w-60 shrink-0 items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition lg:w-full lg:border-transparent",
                 active
-                  ? "border-primary/50 bg-primary/15 text-foreground shadow-glow"
-                  : "border-white/10 bg-card text-muted-foreground hover:border-white/20 hover:text-foreground",
+                  ? "border-primary/40 bg-primary/10 text-foreground lg:border-transparent lg:bg-primary/10"
+                  : "border-white/10 bg-card text-muted-foreground hover:text-foreground lg:bg-transparent lg:hover:bg-white/5",
               )}
             >
-              <span className="flex items-center gap-2">
-                <span
-                  className={cn(
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] font-bold tabular-nums",
-                    finished
-                      ? "bg-emerald-500/20 text-emerald-300"
-                      : active
-                        ? "bg-primary/25 text-primary"
-                        : "bg-white/10 text-muted-foreground",
-                  )}
-                >
-                  {finished ? (
-                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-                  ) : (
-                    index + 1
-                  )}
-                </span>
-                <span
-                  className={cn(
-                    "min-w-0 flex-1 truncate text-sm font-bold",
-                    active && "text-primary",
-                  )}
-                >
-                  {module.shortTitle}
-                </span>
+              <span
+                className={cn(
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold tabular-nums",
+                  finished
+                    ? "bg-emerald-500/15 text-emerald-300"
+                    : active
+                      ? "bg-primary/20 text-primary"
+                      : "bg-white/[0.06] text-muted-foreground",
+                )}
+              >
+                {finished ? (
+                  <Check className="h-3.5 w-3.5" aria-hidden />
+                ) : (
+                  index + 1
+                )}
               </span>
-              <span className="mt-0.5 block truncate pl-7 text-xs text-muted-foreground">
-                {module.tagline}
+              <span
+                className={cn(
+                  "min-w-0 flex-1 truncate text-sm font-semibold",
+                  active && "text-foreground",
+                )}
+              >
+                {module.shortTitle}
               </span>
-              <span className="mt-2.5 flex items-center gap-2">
-                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-                  <span
-                    className={cn(
-                      "block h-full rounded-full transition-[width] duration-500 ease-out",
-                      finished
-                        ? "bg-emerald-400"
-                        : "bg-gradient-to-r from-primary to-accent",
-                    )}
-                    style={{ width: `${stats.percent}%` }}
-                  />
-                </span>
-                <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">
-                  {stats.done}/{stats.total}
-                </span>
+              <span
+                className={cn(
+                  "shrink-0 text-[11px] font-semibold tabular-nums",
+                  finished
+                    ? "text-emerald-300"
+                    : stats.done > 0
+                      ? "text-foreground/80"
+                      : "text-muted-foreground/70",
+                )}
+              >
+                {stats.done}/{stats.total}
               </span>
             </button>
           );
@@ -393,45 +382,42 @@ function ModuleContent({
   return (
     <section className="mt-6">
       <div className="card-surface rounded-3xl p-6 sm:p-7">
-        <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-accent-strong">
-          Module {moduleIndex + 1} / {totalModules}
-        </span>
-        <h2 className="mt-1.5 text-xl font-extrabold sm:text-2xl">{module.title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-accent-strong">
+            Module {moduleIndex + 1} / {totalModules}
+          </span>
+          <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+            {stats.done}/{stats.total} bài · {stats.percent}%
+          </span>
+        </div>
+        <h2 className="mt-2 text-xl font-extrabold sm:text-2xl">{module.title}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           {module.description}
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <MetaPill
-            icon={<Target className="h-3.5 w-3.5" aria-hidden />}
-            text={`Kết quả: ${module.outcome}`}
-          />
-        </div>
-
-        <div className="mt-5 rounded-2xl border border-white/10 bg-background/40 p-4">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-muted-foreground">Tiến độ module này</span>
-            <span className="tabular-nums text-foreground">
-              {stats.done}/{stats.total} bài · {stats.percent}%
-            </span>
-          </div>
+        <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+          <Target className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />
+          <span>
+            <span className="font-semibold text-foreground">Kết quả: </span>
+            {module.outcome}
+          </span>
+        </p>
+        <div
+          role="progressbar"
+          aria-valuenow={stats.percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Tiến độ ${module.shortTitle}`}
+          className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
+        >
           <div
-            role="progressbar"
-            aria-valuenow={stats.percent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`Tiến độ ${module.shortTitle}`}
-            className="mt-2 h-2 overflow-hidden rounded-full bg-secondary"
-          >
-            <div
-              className={cn(
-                "h-full rounded-full transition-[width] duration-500 ease-out",
-                finished
-                  ? "bg-emerald-400"
-                  : "bg-gradient-to-r from-primary to-accent",
-              )}
-              style={{ width: `${stats.percent}%` }}
-            />
-          </div>
+            className={cn(
+              "h-full rounded-full transition-[width] duration-500 ease-out",
+              finished
+                ? "bg-emerald-400"
+                : "bg-gradient-to-r from-primary to-accent",
+            )}
+            style={{ width: `${stats.percent}%` }}
+          />
         </div>
       </div>
 
@@ -526,15 +512,6 @@ function ModuleDoneCard({
   );
 }
 
-function MetaPill({ icon, text }: { icon: React.ReactNode; text: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-secondary/50 px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-      <span className="text-accent">{icon}</span>
-      {text}
-    </span>
-  );
-}
-
 /** Một bài học dạng accordion, kèm nút đánh dấu đã học xong. */
 function LessonCard({
   domId,
@@ -583,9 +560,9 @@ function LessonCard({
               : "Bấm để đánh dấu đã học xong"
           }
           className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition",
+            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition",
             complete
-              ? "border-emerald-400 bg-emerald-500/90 text-white shadow-glow"
+              ? "border-emerald-400 bg-emerald-500/90 text-white"
               : "border-white/20 text-transparent hover:border-primary hover:text-primary/70",
           )}
         >
@@ -636,37 +613,28 @@ function LessonCard({
               />
             </div>
           ) : lesson.videoLabel ? (
-            <div className="mb-5 grid aspect-video place-items-center rounded-2xl border border-dashed border-primary/40 bg-primary/5 px-6 text-center">
-              <div>
-                <PlayCircle className="mx-auto h-10 w-10 text-primary" aria-hidden />
-                <p className="mt-2 text-sm font-bold text-foreground">
+            <div className="mb-5 flex items-center gap-3 rounded-xl border border-dashed border-primary/30 bg-primary/[0.06] px-4 py-3">
+              <PlayCircle className="h-5 w-5 shrink-0 text-primary" aria-hidden />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-foreground">
                   {courseContent.videoPlaceholderPrefix} {lesson.videoLabel}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {courseContent.videoPlaceholderNote}
                 </p>
               </div>
             </div>
           ) : null}
 
-          <div
-            className={cn(
-              "grid gap-4",
-              lesson.aside?.length ? "lg:grid-cols-[1.25fr_0.75fr]" : "",
-            )}
-          >
-            <div className="min-w-0 space-y-4">
-              {lesson.main.map((block, blockIndex) => (
-                <LessonBlockView key={blockIndex} block={block} />
-              ))}
-            </div>
-            {lesson.aside?.length ? (
-              <div className="min-w-0 space-y-4">
-                {lesson.aside.map((block, blockIndex) => (
-                  <LessonBlockView key={blockIndex} block={block} />
-                ))}
-              </div>
-            ) : null}
+          {/* Một cột duy nhất cho đỡ rối: khối chính trước, ghi chú/cột phụ
+              chảy xuống dưới thay vì tách sang cột 320px bên phải. */}
+          <div className="min-w-0 space-y-4">
+            {lesson.main.map((block, blockIndex) => (
+              <LessonBlockView key={`main-${blockIndex}`} block={block} />
+            ))}
+            {lesson.aside?.map((block, blockIndex) => (
+              <LessonBlockView key={`aside-${blockIndex}`} block={block} />
+            ))}
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
