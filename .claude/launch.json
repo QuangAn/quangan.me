@@ -10,6 +10,16 @@
       "env": {
         "NEXT_DIST_DIR": ".next-preview"
       }
+    },
+    {
+      "name": "Cafe Aroma Dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "D:/VibeCode/coffeshop", "run", "dev", "--", "-p", "3210"],
+      "port": 3210,
+      "autoPort": true,
+      "env": {
+        "NEXT_DIST_DIR": ".next-preview"
+      }
     }
   ]
 }
